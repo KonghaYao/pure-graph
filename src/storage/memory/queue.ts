@@ -1,6 +1,6 @@
-import { EventMessage } from '../../types.js';
-import { BaseStreamQueue } from '../../queue/stream-queue.js';
-import { BaseStreamQueueInterface } from '../../queue/stream-queue.js';
+import { CancelEventMessage, EventMessage } from '../../queue/event_message.js';
+import { BaseStreamQueue } from '../../queue/stream_queue.js';
+import { BaseStreamQueueInterface } from '../../queue/stream_queue.js';
 /** 内存实现的消息队列，用于存储消息 */
 export class MemoryStreamQueue extends BaseStreamQueue implements BaseStreamQueueInterface {
     private data: EventMessage[] = [];
@@ -77,6 +77,7 @@ export class MemoryStreamQueue extends BaseStreamQueue implements BaseStreamQueu
     }
     public cancelSignal = new AbortController();
     cancel(): void {
-        this.cancelSignal.abort();
+        this.push(new CancelEventMessage());
+        this.cancelSignal.abort('user cancel this run');
     }
 }

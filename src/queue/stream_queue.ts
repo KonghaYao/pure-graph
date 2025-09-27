@@ -1,6 +1,6 @@
 import { EventEmitter } from 'eventemitter3';
 import { JsonPlusSerializer } from './JsonPlusSerializer.js';
-import { EventMessage } from '../types.js';
+import { EventMessage } from './event_message.js';
 
 /**
  * 流队列事件接口

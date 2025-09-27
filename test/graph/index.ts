@@ -3,7 +3,9 @@ import { createReactAgent, createReactAgentAnnotation } from '@langchain/langgra
 import { createState } from '@langgraph-js/pro';
 const state = createState(createReactAgentAnnotation()).build({});
 export const graph = new StateGraph(state)
-    .addNode('agent', (state) => {
+    .addNode('agent', async (state) => {
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+        console.log('done');
         return {
             messages: [
                 ...state.messages,

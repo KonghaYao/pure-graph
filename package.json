@@ -23,7 +23,9 @@
         "hono": "^4.9.9"
     },
     "devDependencies": {
+        "@langchain/langgraph-sdk": "^0.1.7",
         "@langgraph-js/sdk": "^2.0.1",
-        "@types/node": "^22.13.5"
+        "@types/node": "^22.13.5",
+        "typescript": "^5.9.2"
     }
 }

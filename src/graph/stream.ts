@@ -2,14 +2,14 @@ import { BaseMessageChunk, isBaseMessage } from '@langchain/core/messages';
 import type { BaseCheckpointSaver, LangGraphRunnableConfig } from '@langchain/langgraph';
 import type { Pregel } from '@langchain/langgraph/pregel';
 import { getLangGraphCommand } from '../utils/getLangGraphCommand.js';
-import type { RunKwargs } from '../model.js';
-import type { BaseStreamQueueInterface } from '../queue/stream-queue.js';
+import type { BaseStreamQueueInterface } from '../queue/stream_queue.js';
 
-import { globalCheckPointer, globalMessageQueue } from '../global.js';
+import { globalMessageQueue } from '../global.js';
 import { Run } from '@langgraph-js/sdk';
-import { EventMessage, StreamErrorEventMessage } from '../types.js';
-import { StreamEndEventMessage } from '../types.js';
+import { EventMessage, StreamErrorEventMessage, StreamEndEventMessage } from '../queue/event_message.js';
+
 import { BaseThreadsManager } from '../threads/index.js';
+import { StreamInputData } from '../types.js';
 
 export type LangGraphStreamMode = Pregel<any, any>['streamMode'][number];
 
@@ -17,7 +17,7 @@ export async function streamStateWithQueue(
     threads: BaseThreadsManager,
     run: Run,
     queue: BaseStreamQueueInterface,
-    payload: RunKwargs,
+    payload: StreamInputData,
     options: {
         attempt: number;
         getGraph: (
@@ -208,7 +208,7 @@ export const serialiseAsDict = (obj: unknown) => {
 export async function* streamState(
     threads: BaseThreadsManager,
     run: Run | Promise<Run>,
-    payload: RunKwargs,
+    payload: StreamInputData,
     options: {
         attempt: number;
         getGraph: (
@@ -226,6 +226,7 @@ export async function* streamState(
     try {
         // 启动队列推送任务（在后台异步执行）
         await threads.set(threadId, { status: 'busy' });
+        await threads.updateRun(run.run_id, { status: 'running' });
         const queue = globalMessageQueue.createQueue(queueId);
         const state = queue.onDataReceive();
         streamStateWithQueue(threads, run, queue, payload, options).catch((error) => {
@@ -237,11 +238,13 @@ export async function* streamState(
         for await (const data of state) {
             yield data;
         }
+        await threads.updateRun(run.run_id, { status: 'success' });
     } catch (error) {
         // 如果发生错误，确保清理资源
         console.error('Stream error:', error);
+        await threads.updateRun(run.run_id, { status: 'error' });
         await threads.set(threadId, { status: 'error' });
-        throw error;
+        // throw error;
     } finally {
         // 在完成后立即清理队列，因为消费者已经完成
         await threads.set(threadId, { status: 'idle' });

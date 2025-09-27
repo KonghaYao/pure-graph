@@ -1,4 +1,4 @@
-import { createMemoryEndpoint } from '../..';
+import { createEndpoint } from '../..';
 import { MemoryThreadsManager } from '../../storage/memory/threads.js';
 
-export const client = createMemoryEndpoint(new MemoryThreadsManager());
+export const client = createEndpoint(new MemoryThreadsManager());

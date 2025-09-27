@@ -2,32 +2,8 @@ import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { z } from 'zod';
 import { client } from './endpoint';
+import { MetadataSchema } from './zod';
 const api = new Hono();
-
-export const AssistantConfigurable = z
-    .object({
-        thread_id: z.string().optional(),
-        thread_ts: z.string().optional(),
-    })
-    .catchall(z.unknown());
-
-export const AssistantConfig = z
-    .object({
-        tags: z.array(z.string()).optional(),
-        recursion_limit: z.number().int().optional(),
-        configurable: AssistantConfigurable.optional(),
-    })
-    .catchall(z.unknown())
-    .describe('The configuration of an assistant.');
-
-export const Assistant = z.object({
-    assistant_id: z.string().uuid(),
-    graph_id: z.string(),
-    config: AssistantConfig,
-    created_at: z.string(),
-    updated_at: z.string(),
-    metadata: z.object({}).catchall(z.any()),
-});
 
 api.post(
     '/assistants/search',
@@ -35,7 +11,7 @@ api.post(
         'json',
         z.object({
             graph_id: z.string().optional(),
-            metadata: z.unknown().optional(),
+            metadata: MetadataSchema.optional(),
             limit: z.number().int().optional(),
             offset: z.number().int().optional(),
         }),

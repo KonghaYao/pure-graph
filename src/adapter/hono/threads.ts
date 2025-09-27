@@ -2,6 +2,7 @@ import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { z } from 'zod';
 import { client } from './endpoint';
+import { CommandSchema, MetadataSchema } from './zod';
 
 const api = new Hono();
 
@@ -12,26 +13,26 @@ api.post(
         'json',
         z
             .object({
-                supersteps: z
-                    .array(
-                        z.object({
-                            updates: z.array(
-                                z.object({
-                                    values: z.unknown().nullish(),
-                                    command: z.unknown().nullish(),
-                                    as_node: z.string(),
-                                }),
-                            ),
-                        }),
-                    )
-                    .describe('The supersteps to apply to the thread.')
-                    .optional(),
+                // supersteps: z
+                //     .array(
+                //         z.object({
+                //             updates: z.array(
+                //                 z.object({
+                //                     values: z.unknown(),
+                //                     command: CommandSchema.optional(),
+                //                     as_node: z.string(),
+                //                 }),
+                //             ),
+                //         }),
+                //     )
+                //     .describe('The supersteps to apply to the thread.')
+                //     .optional(),
                 thread_id: z
                     .string()
                     .uuid()
                     .describe('The ID of the thread. If not provided, an ID is generated.')
                     .optional(),
-                metadata: z.object({}).catchall(z.any()).describe('Metadata for the thread.').optional(),
+                metadata: MetadataSchema.optional(),
                 if_exists: z.union([z.literal('raise'), z.literal('do_nothing')]).optional(),
             })
             .describe('Payload for creating a thread.'),

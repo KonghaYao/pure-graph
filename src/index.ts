@@ -1,25 +1,26 @@
 import { StreamEvent } from '@langchain/core/tracers/log_stream';
 import { streamState } from './graph/stream.js';
 import {
+    Thread,
     Assistant,
-    AssistantGraph,
-    AssistantSortBy,
-    CancelAction,
-    ILangGraphClient,
-    Metadata,
-    RunStatus,
-    SortOrder,
+    Run,
     StreamMode,
-} from '@langgraph-js/sdk';
-import type { Run } from '@langgraph-js/sdk';
+    Command,
+    Metadata,
+    AssistantGraph,
+    OnConflictBehavior,
+    ThreadStatus,
+    Config,
+    Checkpoint,
+} from '@langchain/langgraph-sdk';
 import { getGraph, GRAPHS } from './utils/getGraph.js';
 import { BaseThreadsManager } from './threads/index.js';
 import { RunKwargs } from './model.js';
-import { MemoryThreadsManager } from './storage/memory/threads.js';
 import { globalMessageQueue } from './global.js';
+import { AssistantSortBy, CancelAction, ILangGraphClient, RunStatus, SortOrder, StreamInputData } from './types';
 export { registerGraph } from './utils/getGraph.js';
 
-export const AssistantEndpoint = {
+export const AssistantEndpoint: ILangGraphClient['assistants'] = {
     async search(query?: {
         graphId?: string;
         metadata?: Metadata;
@@ -40,20 +41,23 @@ export const AssistantEndpoint = {
                     version: 1,
                     name: query.graphId,
                     description: '',
-                },
+                } as Assistant,
             ];
         }
-        return Object.entries(GRAPHS).map(([graphId, _]) => ({
-            assistant_id: graphId,
-            graph_id: graphId,
-            config: {},
-            metadata: {},
-            version: 1,
-            name: graphId,
-            description: '',
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-        }));
+        return Object.entries(GRAPHS).map(
+            ([graphId, _]) =>
+                ({
+                    assistant_id: graphId,
+                    graph_id: graphId,
+                    config: {},
+                    metadata: {},
+                    version: 1,
+                    name: graphId,
+                    description: '',
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString(),
+                } as Assistant),
+        );
     },
     async getGraph(assistantId: string, options?: { xray?: boolean | number }): Promise<AssistantGraph> {
         const config = {};
@@ -66,7 +70,7 @@ export const AssistantEndpoint = {
     },
 };
 
-export const createMemoryEndpoint = (threads: BaseThreadsManager) => {
+export const createEndpoint = (threads: BaseThreadsManager): ILangGraphClient => {
     return {
         assistants: AssistantEndpoint,
         threads,
@@ -77,7 +81,7 @@ export const createMemoryEndpoint = (threads: BaseThreadsManager) => {
             async cancel(threadId: string, runId: string, wait?: boolean, action?: CancelAction): Promise<void> {
                 return globalMessageQueue.cancelQueue(runId);
             },
-            async *stream(threadId: string, assistantId: string, payload: RunKwargs) {
+            async *stream(threadId: string, assistantId: string, payload: StreamInputData) {
                 if (!payload.config) {
                     payload.config = {
                         configurable: {
@@ -89,7 +93,7 @@ export const createMemoryEndpoint = (threads: BaseThreadsManager) => {
 
                 const run = threads.createRun(threadId, assistantId, payload);
 
-                for await (const data of streamState(threads, run, payload || {}, {
+                for await (const data of streamState(threads, run, payload, {
                     attempt: 0,
                     getGraph,
                 })) {

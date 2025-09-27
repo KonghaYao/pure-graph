@@ -1,4 +1,4 @@
-import { StreamQueueManager } from '../queue/stream-queue';
+import { StreamQueueManager } from '../queue/stream_queue';
 import { MemorySaver } from './memory/checkpoint';
 import { MemoryStreamQueue } from './memory/queue';
 

@@ -45,4 +45,7 @@ export class BaseThreadsManager<ValuesType = unknown> {
     listRuns(threadId: string, options?: { limit?: number; offset?: number; status?: RunStatus }): Promise<Run[]> {
         throw new Error('Function not implemented.');
     }
+    updateRun(runId: string, run: Partial<Run>): Promise<void> {
+        throw new Error('Function not implemented.');
+    }
 }

@@ -107,7 +107,6 @@ export class MemoryThreadsManager<ValuesType = unknown> extends BaseThreadsManag
             throw new Error(`Thread with ID ${threadId} not found.`);
         }
         this.threads[index] = { ...this.threads[index], ...thread };
-        console.log(this.threads[index]);
     }
     async delete(threadId: string): Promise<void> {
         const initialLength = this.threads.length;
@@ -144,5 +143,12 @@ export class MemoryThreadsManager<ValuesType = unknown> extends BaseThreadsManag
             filteredRuns = filteredRuns.slice(options.offset || 0, (options.offset || 0) + options.limit);
         }
         return filteredRuns;
+    }
+    async updateRun(runId: string, run: Partial<Run>): Promise<void> {
+        const index = this.runs.findIndex((r) => r.run_id === runId);
+        if (index === -1) {
+            throw new Error(`Run with ID ${runId} not found.`);
+        }
+        this.runs[index] = { ...this.runs[index], ...run };
     }
 }
