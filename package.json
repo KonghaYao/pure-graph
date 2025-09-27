@@ -1,0 +1,29 @@
+{
+    "name": "pure-graph",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "dev": "bun run test/hono.ts"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "packageManager": "pnpm@10.6.2",
+    "dependencies": {
+        "@langchain/core": "^0.3.77",
+        "@langchain/langgraph": "^0.4.9",
+        "@langchain/langgraph-checkpoint": "^0.1.1",
+        "@langgraph-js/pro": "^1.8.1",
+        "eventemitter3": "^5.0.1",
+        "zod": "^3"
+    },
+    "optionalDependencies": {
+        "@hono/zod-validator": "^0.7.3",
+        "hono": "^4.9.9"
+    },
+    "devDependencies": {
+        "@langgraph-js/sdk": "^2.0.1",
+        "@types/node": "^22.13.5"
+    }
+}
