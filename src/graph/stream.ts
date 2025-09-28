@@ -246,7 +246,7 @@ export async function* streamState(
         await threads.set(threadId, { status: 'error' });
         // throw error;
     } finally {
-        // 在完成后立即清理队列，因为消费者已经完成
+        // 在完成后清理队列
         await threads.set(threadId, { status: 'idle' });
         globalMessageQueue.removeQueue(queueId);
     }

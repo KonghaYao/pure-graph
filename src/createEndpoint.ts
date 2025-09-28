@@ -78,12 +78,15 @@ export const createEndpoint = (threads: BaseThreadsManager): ILangGraphClient =>
                     };
                 }
 
-                const run = threads.createRun(threadId, assistantId, payload);
-
-                for await (const data of streamState(threads, run, payload, {
-                    attempt: 0,
-                    getGraph,
-                })) {
+                for await (const data of streamState(
+                    threads,
+                    threads.createRun(threadId, assistantId, payload),
+                    payload,
+                    {
+                        attempt: 0,
+                        getGraph,
+                    },
+                )) {
                     yield data;
                 }
             },

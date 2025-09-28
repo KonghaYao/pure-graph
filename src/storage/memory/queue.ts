@@ -21,20 +21,26 @@ export class MemoryStreamQueue extends BaseStreamQueue implements BaseStreamQueu
      * 异步生成器：支持 for await...of 方式消费队列数据
      */
     async *onDataReceive(): AsyncGenerator<EventMessage, void, unknown> {
-        const queue: EventMessage[] = [];
+        let queue: EventMessage[] = [];
         let pendingResolve: (() => void) | null = null;
         let isStreamEnded = false;
         const handleData = async (item: EventMessage) => {
             const data = this.compressMessages ? ((await this.decodeData(item as any)) as EventMessage) : item;
             queue.push(data);
-
             // 检查是否为流结束或错误信号
             if (
                 data.event === '__stream_end__' ||
                 data.event === '__stream_error__' ||
                 data.event === '__stream_cancel__'
             ) {
-                isStreamEnded = true;
+                setTimeout(() => {
+                    isStreamEnded = true;
+                    if (pendingResolve) {
+                        pendingResolve();
+                        pendingResolve = null;
+                    }
+                }, 300);
+
                 if (data.event === '__stream_cancel__') {
                     this.cancel();
                 }
@@ -45,14 +51,16 @@ export class MemoryStreamQueue extends BaseStreamQueue implements BaseStreamQueu
                 pendingResolve = null;
             }
         };
-
+        // todo 这个框架的事件监听的数据返回顺序有误
         this.on('dataChange', handleData as any);
 
         try {
             while (!isStreamEnded) {
                 if (queue.length > 0) {
-                    const item = queue.shift() as EventMessage;
-                    yield item;
+                    for (const item of queue) {
+                        yield item;
+                    }
+                    queue = [];
                 } else {
                     await new Promise((resolve) => {
                         pendingResolve = resolve as () => void;

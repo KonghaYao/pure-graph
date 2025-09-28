@@ -53,7 +53,6 @@ api.post(
             for await (const { event, data } of client.runs.stream(thread_id, payload.assistant_id, payload)) {
                 await stream.writeSSE({ data: serialiseAsDict(data), event });
             }
-            // await stream.sleep(500); // 不知为何要等
         });
     },
 );

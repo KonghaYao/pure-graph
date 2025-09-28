@@ -16,7 +16,7 @@ export class CancelEventMessage extends EventMessage {
 
 export class StreamEndEventMessage extends EventMessage {
     constructor() {
-        super('__stream_end__');
+        super('__stream_end__', 'stream end');
     }
 }
 

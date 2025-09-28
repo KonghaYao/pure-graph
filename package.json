@@ -1,16 +1,8 @@
 {
     "name": "@langgraph-js/pure-graph",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "",
     "main": "dist/index.js",
-    "exports": {
-        ".": {
-            "import": "./dist/index.js"
-        },
-        "/hono": {
-            "import": "./dist/adapter/hono/index.js"
-        }
-    },
     "scripts": {
         "dev": "bun run test/hono.ts",
         "build": "tsc"
