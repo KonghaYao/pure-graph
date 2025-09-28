@@ -3,9 +3,7 @@ import {
     BaseStore,
     CompiledGraph,
     CompiledStateGraph,
-    Graph,
     LangGraphRunnableConfig,
-    MemorySaver,
 } from '@langchain/langgraph';
 import { globalCheckPointer } from '../global';
 
@@ -19,7 +17,7 @@ export async function registerGraph(
     graphId: string,
     graph: CompiledGraph<any> | CompiledStateGraph<any, any, any, any, any, any, any> | CompiledGraphFactory<any>,
 ) {
-    return (GRAPHS[graphId] = graph);
+    GRAPHS[graphId] = graph;
 }
 export async function getGraph(
     graphId: string,
