@@ -26,6 +26,8 @@
     },
     "devDependencies": {
         "@langchain/langgraph-sdk": "^0.1.7",
+        "@langchain/mcp-adapters": "^0.6.0",
+        "@langchain/openai": "^0.6.13",
         "@langgraph-js/sdk": "^2.0.1",
         "@types/node": "^22.13.5",
         "typescript": "^5.9.2"

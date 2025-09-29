@@ -1,0 +1,31 @@
+{
+    "agent_protocol": {
+        "id": "novel-writing-assistant",
+        "protocolVersion": "1.0.0",
+        "name": "小说创作助手",
+        "description": "专业的AI小说创作助手，提供情节构思、人物塑造、世界观构建和写作指导的全方位服务",
+        "url": "https://api.novelai.net/ai/generate",
+        "iconUrl": "https://img.icons8.com/fluency/96/000000/book.png",
+        "version": "2.0.1",
+        "documentationUrl": "https://docs.novelai.net/",
+        "llm": [
+            {
+                "provider": "openai",
+                "model": "gpt-4o-mini"
+            },
+            {
+                "provider": "openai",
+                "model": "qwen-plus"
+            }
+        ],
+        "systemPrompt": "你是一位经验丰富的小说家和创意写作导师，精通各种文学体裁和叙事技巧。你善于分析经典作品的结构，帮助创作者构建引人入胜的情节、塑造立体的人物形象，并提供专业的写作建议和灵感启发。",
+        "tools": [
+            {
+                "tool_type": "mcp",
+                "url": "https://mcp.exa.ai/mcp?exaApiKey=ce1249b7-6b78-4ec8-8be9-41823b5d2365",
+                "headers": {}
+            }
+        ],
+        "subAgents": []
+    }
+}
