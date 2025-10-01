@@ -1,8 +1,15 @@
 /** @ts-ignore */
 import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
 import { client } from './endpoint';
-import { AssistantConfig, CommandSchema, MetadataSchema } from './zod';
+import {
+    AssistantsSearchSchema,
+    AssistantGraphQuerySchema,
+    RunStreamPayloadSchema,
+    RunListQuerySchema,
+    RunCancelQuerySchema,
+    ThreadCreatePayloadSchema,
+    ThreadSearchPayloadSchema,
+} from '../zod';
 import { serialiseAsDict } from '../../graph/stream';
 
 // Next.js App Router 的 SSE 响应实现
@@ -42,9 +49,10 @@ export async function GET(req: NextRequest) {
         if (match) {
             const assistant_id = match[1];
             const xrayParam = url.searchParams.get('xray');
-            const xray = xrayParam !== null ? xrayParam === 'true' : undefined;
+            const queryParams = { xray: xrayParam };
+            const { xray } = AssistantGraphQuerySchema.parse(queryParams);
             const data = await client.assistants.getGraph(assistant_id, {
-                xray,
+                xray: xray !== undefined ? xray === 'true' : undefined,
             });
             return NextResponse.json(data);
         }
@@ -67,11 +75,17 @@ export async function GET(req: NextRequest) {
             const thread_id = match[1];
             const limit = url.searchParams.get('limit');
             const offset = url.searchParams.get('offset');
-            const status = url.searchParams.get('status') as any;
+            const status = url.searchParams.get('status');
+            const queryParams = { limit, offset, status };
+            const {
+                limit: parsedLimit,
+                offset: parsedOffset,
+                status: parsedStatus,
+            } = RunListQuerySchema.parse(queryParams);
             const runs = await client.runs.list(thread_id, {
-                limit: limit ? Number(limit) : undefined,
-                offset: offset ? Number(offset) : undefined,
-                status: status ?? undefined,
+                limit: parsedLimit ? Number(parsedLimit) : undefined,
+                offset: parsedOffset ? Number(parsedOffset) : undefined,
+                status: parsedStatus ?? undefined,
             });
             return Response.json(runs);
         }
@@ -87,13 +101,7 @@ export async function POST(req: NextRequest) {
     // Assistants routes
     if (pathname.endsWith('/assistants/search')) {
         const body = await req.json();
-        const schema = z.object({
-            graph_id: z.string().optional(),
-            metadata: MetadataSchema.optional(),
-            limit: z.number().int().optional(),
-            offset: z.number().int().optional(),
-        });
-        const payload = schema.parse(body);
+        const payload = AssistantsSearchSchema.parse(body);
         const data = await client.assistants.search({
             graphId: payload.graph_id,
             metadata: payload.metadata as any,
@@ -108,14 +116,7 @@ export async function POST(req: NextRequest) {
     // Threads routes
     if (pathname.endsWith('/threads')) {
         const body = await req.json();
-        const schema = z
-            .object({
-                thread_id: z.string().uuid().optional(),
-                metadata: MetadataSchema.optional(),
-                if_exists: z.union([z.literal('raise'), z.literal('do_nothing')]).optional(),
-            })
-            .describe('Payload for creating a thread.');
-        const payload = schema.parse(body);
+        const payload = ThreadCreatePayloadSchema.parse(body);
         const thread = await client.threads.create({
             thread_id: payload.thread_id,
             metadata: payload.metadata as any,
@@ -126,18 +127,7 @@ export async function POST(req: NextRequest) {
 
     if (pathname.endsWith('/threads/search')) {
         const body = await req.json();
-        const schema = z
-            .object({
-                metadata: z.record(z.unknown()).optional(),
-                status: z.enum(['idle', 'busy', 'interrupted', 'error']).optional(),
-                values: z.record(z.unknown()).optional(),
-                limit: z.number().int().gte(1).lte(1000).optional(),
-                offset: z.number().int().gte(0).optional(),
-                sort_by: z.enum(['thread_id', 'status', 'created_at', 'updated_at']).optional(),
-                sort_order: z.enum(['asc', 'desc']).optional(),
-            })
-            .describe('Payload for listing threads.');
-        const payload = schema.parse(body);
+        const payload = ThreadSearchPayloadSchema.parse(body);
         const result = await client.threads.search({
             metadata: payload.metadata as any,
             status: payload.status as any,
@@ -157,32 +147,7 @@ export async function POST(req: NextRequest) {
         if (match) {
             const thread_id = match[1];
             const body = await req.json();
-            const schema = z
-                .object({
-                    assistant_id: z.union([z.string().uuid(), z.string()]),
-                    checkpoint_id: z.string().optional(),
-                    input: z.any().optional(),
-                    command: CommandSchema.optional(),
-                    metadata: MetadataSchema.optional(),
-                    config: AssistantConfig.optional(),
-                    webhook: z.string().optional(),
-                    interrupt_before: z.union([z.literal('*'), z.array(z.string())]).optional(),
-                    interrupt_after: z.union([z.literal('*'), z.array(z.string())]).optional(),
-                    on_disconnect: z.enum(['cancel', 'continue']).optional().default('continue'),
-                    multitask_strategy: z.enum(['reject', 'rollback', 'interrupt', 'enqueue']).optional(),
-                    stream_mode: z
-                        .array(z.enum(['values', 'messages', 'messages-tuple', 'updates', 'events', 'debug', 'custom']))
-                        .optional(),
-                    stream_subgraphs: z.boolean().optional(),
-                    stream_resumable: z.boolean().optional(),
-                    after_seconds: z.number().optional(),
-                    if_not_exists: z.enum(['create', 'reject']).optional(),
-                    on_completion: z.enum(['complete', 'continue']).optional(),
-                    feedback_keys: z.array(z.string()).optional(),
-                    langsmith_tracer: z.unknown().optional(),
-                })
-                .describe('Payload for creating a stateful run.');
-            const payload = schema.parse(body);
+            const payload = RunStreamPayloadSchema.parse(body);
             const generator = client.runs.stream(thread_id, payload.assistant_id as string, payload as any);
             return sseResponse(generator as any);
         }
@@ -194,8 +159,13 @@ export async function POST(req: NextRequest) {
         if (match) {
             const thread_id = match[1];
             const run_id = match[2];
-            const wait = (url.searchParams.get('wait') ?? 'false') === 'true';
-            const action = (url.searchParams.get('action') as any) ?? 'interrupt';
+            const waitParam = url.searchParams.get('wait');
+            const actionParam = url.searchParams.get('action');
+            const queryParams = {
+                wait: waitParam ? waitParam === 'true' : false,
+                action: actionParam ?? 'interrupt',
+            };
+            const { wait, action } = RunCancelQuerySchema.parse(queryParams);
             const promise = client.runs.cancel(thread_id, run_id, wait, action);
             if (wait) await promise;
             return new Response(null, { status: wait ? 204 : 202 });
