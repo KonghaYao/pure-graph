@@ -83,9 +83,9 @@ export async function GET(req: NextRequest) {
                 status: parsedStatus,
             } = RunListQuerySchema.parse(queryParams);
             const runs = await client.runs.list(thread_id, {
-                limit: parsedLimit ? Number(parsedLimit) : undefined,
-                offset: parsedOffset ? Number(parsedOffset) : undefined,
-                status: parsedStatus ?? undefined,
+                limit: parsedLimit,
+                offset: parsedOffset,
+                status: parsedStatus,
             });
             return Response.json(runs);
         }

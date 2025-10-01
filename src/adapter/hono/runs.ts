@@ -41,7 +41,7 @@ api.get(
     async (c) => {
         const { thread_id } = c.req.valid('param');
         const { limit, offset, status } = c.req.valid('query');
-        const runs = await client.runs.list(thread_id, { limit: Number(limit), offset: Number(offset), status });
+        const runs = await client.runs.list(thread_id, { limit, offset, status });
         return c.json(runs);
     },
 );
