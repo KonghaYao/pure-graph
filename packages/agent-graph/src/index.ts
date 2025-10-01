@@ -5,7 +5,7 @@ import { createReactAgent, createReactAgentAnnotation } from '@langchain/langgra
 import { ChatOpenAI } from '@langchain/openai';
 import { BaseChatModel } from '@langchain/core/language_models/chat_models';
 import { createTools } from './tools';
-import { globalCheckPointer } from '../../../src/';
+import { createEntrypointGraph, globalCheckPointer } from '../../../src/';
 const AgentProtocolState = createState().build({
     agent_protocol: Annotation<AgentProtocol>(),
     model_name: Annotation<string>(),
@@ -28,20 +28,23 @@ export const createLLM = async (protocol: AgentProtocol, model_name?: string): P
     });
 };
 
-export const graph = entrypoint(
-    { name: 'agent-graph', checkpointer: globalCheckPointer },
-    async (state: typeof AgentGraphState.State) => {
-        const protocol = state.agent_protocol;
+export const graph = createEntrypointGraph({
+    stateSchema: AgentGraphState,
+    graph: entrypoint(
+        { name: 'agent-graph', checkpointer: globalCheckPointer },
+        async (state: typeof AgentGraphState.State) => {
+            const protocol = state.agent_protocol;
 
-        const tools = await createTools(protocol);
+            const tools = await createTools(protocol);
 
-        const agent = createReactAgent({
-            llm: await createLLM(protocol, state.model_name),
-            tools,
-            prompt: protocol.systemPrompt,
-            stateSchema: AgentGraphState,
-        });
-        const response = agent.invoke(state);
-        return response;
-    },
-);
+            const agent = createReactAgent({
+                llm: await createLLM(protocol, state.model_name),
+                tools,
+                prompt: protocol.systemPrompt,
+                stateSchema: AgentGraphState,
+            });
+            const response = agent.invoke(state);
+            return response;
+        },
+    ),
+});

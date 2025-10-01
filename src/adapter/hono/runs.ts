@@ -28,7 +28,7 @@ api.post(
         return streamSSE(c, async (stream) => {
             /** @ts-ignore zod v3 的问题，与 ts 类型不一致 */
             for await (const { event, data } of client.runs.stream(thread_id, payload.assistant_id, payload)) {
-                await stream.writeSSE({ data: serialiseAsDict(data), event });
+                await stream.writeSSE({ data: serialiseAsDict(data) ?? '', event });
             }
         });
     },

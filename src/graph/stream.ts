@@ -114,7 +114,7 @@ export async function streamStateWithQueue(
                 }
                 if (mode === 'values') {
                     await threads.set(run.thread_id, {
-                        values: JSON.parse(serialiseAsDict(data)),
+                        values: data ? JSON.parse(serialiseAsDict(data)) : '',
                     });
                 }
             } else if (userStreamMode.includes('events')) {
