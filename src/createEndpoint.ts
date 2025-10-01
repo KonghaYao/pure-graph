@@ -62,7 +62,14 @@ export const createEndpoint = (threads: BaseThreadsManager): ILangGraphClient =>
         assistants: AssistantEndpoint,
         threads,
         runs: {
-            list(threadId: string, options?: { limit?: number; offset?: number; status?: RunStatus }): Promise<Run[]> {
+            list(
+                threadId: string,
+                options?: {
+                    limit?: number;
+                    offset?: number;
+                    status?: RunStatus;
+                },
+            ): Promise<Run[]> {
                 return threads.listRuns(threadId, options);
             },
             async cancel(threadId: string, runId: string, wait?: boolean, action?: CancelAction): Promise<void> {

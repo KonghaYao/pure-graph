@@ -54,7 +54,13 @@ export async function streamStateWithQueue(
         libStreamMode.add('values');
     }
 
-    await queue.push(new EventMessage('metadata', { run_id: run.run_id, attempt: options.attempt, graph_id: graphId }));
+    await queue.push(
+        new EventMessage('metadata', {
+            run_id: run.run_id,
+            attempt: options.attempt,
+            graph_id: graphId,
+        }),
+    );
 
     const metadata = {
         ...payload.config?.metadata,
@@ -107,7 +113,9 @@ export async function streamStateWithQueue(
                     }
                 }
                 if (mode === 'values') {
-                    await threads.set(run.thread_id, { values: JSON.parse(serialiseAsDict(data)) });
+                    await threads.set(run.thread_id, {
+                        values: JSON.parse(serialiseAsDict(data)),
+                    });
                 }
             } else if (userStreamMode.includes('events')) {
                 await queue.push(new EventMessage('events', event));
@@ -151,7 +159,9 @@ export async function streamStateWithQueue(
                     if (messages[message.id] == null) {
                         messages[message.id] = message;
                         await queue.push(
-                            new EventMessage('messages/metadata', { [message.id]: { metadata: event.metadata } }),
+                            new EventMessage('messages/metadata', {
+                                [message.id]: { metadata: event.metadata },
+                            }),
                         );
                     } else {
                         messages[message.id] = messages[message.id].concat(message);
@@ -178,7 +188,7 @@ export async function* createStreamFromQueue(queueId: string): AsyncGenerator<{ 
     return queue.onDataReceive();
 }
 
-export const serialiseAsDict = (obj: unknown) => {
+export const serialiseAsDict = (obj: unknown, indent = 2) => {
     return JSON.stringify(
         obj,
         function (key: string | number, value: unknown) {
@@ -196,7 +206,7 @@ export const serialiseAsDict = (obj: unknown) => {
 
             return value;
         },
-        2,
+        indent,
     );
 };
 /**
