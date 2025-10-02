@@ -16,7 +16,9 @@
         "@langchain/core": "^0.3.77",
         "@langchain/langgraph": "^0.4.9",
         "@langchain/langgraph-checkpoint": "^0.1.1",
+        "@langchain/langgraph-checkpoint-sqlite": "^0.2.1",
         "@langgraph-js/pro": "^1.8.1",
+        "better-sqlite3": "^12.4.1",
         "eventemitter3": "^5.0.1",
         "zod": "^3"
     },
