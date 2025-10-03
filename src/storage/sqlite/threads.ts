@@ -11,7 +11,7 @@ import {
     ThreadStatus,
 } from '@langgraph-js/sdk';
 import { SqliteSaver } from './checkpoint.js';
-import { Database, DatabaseType } from './DB.js';
+import { DatabaseType } from './DB.js';
 interface ThreadRow {
     thread_id: string;
     created_at: string;

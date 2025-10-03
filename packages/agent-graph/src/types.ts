@@ -10,8 +10,8 @@ export interface MCPTool extends AgentTool {
     url: string;
     headers?: Record<string, string>;
 }
-export interface PrebuiltTool extends AgentTool {
-    tool_type: 'prebuilt';
+export interface BuiltinTool extends AgentTool {
+    tool_type: 'builtin';
 }
 
 export interface InnerTool extends AgentTool {
@@ -37,6 +37,6 @@ export interface AgentProtocol {
         model: string;
     }[];
     systemPrompt: string;
-    tools: (PrebuiltTool | InnerTool | MCPTool)[];
+    tools: (BuiltinTool | InnerTool | MCPTool)[];
     subAgents: SubAgent[];
 }

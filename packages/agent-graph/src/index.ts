@@ -41,7 +41,7 @@ export const graph = createEntrypointGraph({
             prompt: protocol.systemPrompt,
             stateSchema: AgentGraphState,
         });
-        const response = agent.invoke(state);
+        const response = await agent.invoke(state);
         return response;
     }),
 });

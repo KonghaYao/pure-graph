@@ -24,6 +24,10 @@
                 "tool_type": "mcp",
                 "url": "https://mcp.exa.ai/mcp?exaApiKey=ce1249b7-6b78-4ec8-8be9-41823b5d2365",
                 "headers": {}
+            },
+            {
+                "tool_type": "builtin",
+                "name": "tavily_search"
             }
         ],
         "subAgents": []
