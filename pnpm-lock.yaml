@@ -95,6 +95,9 @@ importers:
       '@langchain/openai':
         specifier: ^0.6.13
         version: 0.6.13(@langchain/core@0.3.77(openai@5.23.1(zod@3.25.76)))
+      '@langgraph-js/pure-graph':
+        specifier: workspace:^*
+        version: link:../..
 
 packages:
 
