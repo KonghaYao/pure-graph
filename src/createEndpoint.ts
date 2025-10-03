@@ -2,7 +2,7 @@ import { StreamEvent } from '@langchain/core/tracers/log_stream';
 import { streamState } from './graph/stream.js';
 import { Assistant, Run, StreamMode, Metadata, AssistantGraph } from '@langchain/langgraph-sdk';
 import { getGraph, GRAPHS } from './utils/getGraph.js';
-import { globalMessageQueue, globalThreadsManager } from './global.js';
+import { LangGraphGlobal } from './global.js';
 import { AssistantSortBy, CancelAction, ILangGraphClient, RunStatus, SortOrder, StreamInputData } from './types.js';
 export { registerGraph } from './utils/getGraph.js';
 
@@ -57,7 +57,7 @@ export const AssistantEndpoint: ILangGraphClient['assistants'] = {
 };
 
 export const createEndpoint = (): ILangGraphClient => {
-    const threads = globalThreadsManager;
+    const threads = LangGraphGlobal.globalThreadsManager;
     return {
         assistants: AssistantEndpoint,
         threads,
@@ -73,7 +73,7 @@ export const createEndpoint = (): ILangGraphClient => {
                 return threads.listRuns(threadId, options);
             },
             async cancel(threadId: string, runId: string, wait?: boolean, action?: CancelAction): Promise<void> {
-                return globalMessageQueue.cancelQueue(runId);
+                return LangGraphGlobal.globalMessageQueue.cancelQueue(runId);
             },
             async *stream(threadId: string, assistantId: string, payload: StreamInputData) {
                 if (!payload.config) {

@@ -5,7 +5,7 @@ import {
     CompiledStateGraph,
     LangGraphRunnableConfig,
 } from '@langchain/langgraph';
-import { globalCheckPointer } from '../global';
+import { LangGraphGlobal } from '../global';
 
 export type CompiledGraphFactory<T extends string> = (config: {
     configurable?: Record<string, unknown>;
@@ -33,9 +33,9 @@ export async function getGraph(
         typeof GRAPHS[graphId] === 'function' ? await GRAPHS[graphId](config ?? { configurable: {} }) : GRAPHS[graphId];
 
     if (typeof options?.checkpointer !== 'undefined') {
-        compiled.checkpointer = options?.checkpointer ?? globalCheckPointer;
+        compiled.checkpointer = options?.checkpointer ?? LangGraphGlobal.globalCheckPointer;
     } else {
-        compiled.checkpointer = globalCheckPointer;
+        compiled.checkpointer = LangGraphGlobal.globalCheckPointer;
     }
 
     compiled.store = options?.store ?? undefined;

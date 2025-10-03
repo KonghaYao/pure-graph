@@ -4,7 +4,7 @@ import type { Pregel } from '@langchain/langgraph/pregel';
 import { getLangGraphCommand } from '../utils/getLangGraphCommand.js';
 import type { BaseStreamQueueInterface } from '../queue/stream_queue.js';
 
-import { globalMessageQueue } from '../global.js';
+import { LangGraphGlobal } from '../global.js';
 import { Run } from '@langgraph-js/sdk';
 import { EventMessage, StreamErrorEventMessage, StreamEndEventMessage } from '../queue/event_message.js';
 
@@ -184,7 +184,7 @@ export async function streamStateWithQueue(
  * @returns 数据流生成器
  */
 export async function* createStreamFromQueue(queueId: string): AsyncGenerator<{ event: string; data: unknown }> {
-    const queue = globalMessageQueue.getQueue(queueId);
+    const queue = LangGraphGlobal.globalMessageQueue.getQueue(queueId);
     return queue.onDataReceive();
 }
 
@@ -237,12 +237,12 @@ export async function* streamState(
         // 启动队列推送任务（在后台异步执行）
         await threads.set(threadId, { status: 'busy' });
         await threads.updateRun(run.run_id, { status: 'running' });
-        const queue = globalMessageQueue.createQueue(queueId);
+        const queue = LangGraphGlobal.globalMessageQueue.createQueue(queueId);
         const state = queue.onDataReceive();
         streamStateWithQueue(threads, run, queue, payload, options).catch((error) => {
             console.error('Queue task error:', error);
             // 如果生产者出错，向队列推送错误信号
-            globalMessageQueue.pushToQueue(queueId, new StreamErrorEventMessage(error));
+            LangGraphGlobal.globalMessageQueue.pushToQueue(queueId, new StreamErrorEventMessage(error));
             // TODO 不知道这里需不需要错误处理
         });
         for await (const data of state) {
@@ -258,6 +258,6 @@ export async function* streamState(
     } finally {
         // 在完成后清理队列
         await threads.set(threadId, { status: 'idle' });
-        globalMessageQueue.removeQueue(queueId);
+        LangGraphGlobal.globalMessageQueue.removeQueue(queueId);
     }
 }
