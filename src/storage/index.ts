@@ -2,7 +2,7 @@ import { StreamQueueManager } from '../queue/stream_queue';
 import { MemorySaver } from './memory/checkpoint';
 import { MemoryStreamQueue } from './memory/queue';
 import { MemoryThreadsManager } from './memory/threads';
-import { SqliteSaver } from './sqlite/checkpoint';
+import type { SqliteSaver as SqliteSaverType } from './sqlite/checkpoint';
 import { SQLiteThreadsManager } from './sqlite/threads';
 
 // 所有的适配实现，都请写到这里，通过环境变量进行判断使用哪种方式进行适配
@@ -21,7 +21,7 @@ export const createMessageQueue = () => {
     return new StreamQueueManager(q);
 };
 
-export const createThreadManager = (config: { checkpointer?: SqliteSaver }) => {
+export const createThreadManager = (config: { checkpointer?: SqliteSaverType }) => {
     if (process.env.SQLITE_DATABASE_URI && config.checkpointer) {
         return new SQLiteThreadsManager(config.checkpointer);
     }

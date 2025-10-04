@@ -1,4 +1,5 @@
-import { DatabaseType, Database } from './DB';
+import { DatabaseType } from './type.js';
+import { Database } from './DB.js';
 import type { RunnableConfig } from '@langchain/core/runnables';
 import {
     BaseCheckpointSaver,
@@ -171,7 +172,7 @@ CREATE TABLE IF NOT EXISTS writes (
 
         const stm = checkpoint_id ? this.withCheckpoint : this.withoutCheckpoint;
         const row = stm.get(...args) as CheckpointRow;
-        if (row === undefined) return undefined;
+        if (row === undefined || row === null) return undefined;
 
         let finalConfig = config;
 

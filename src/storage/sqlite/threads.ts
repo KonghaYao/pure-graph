@@ -10,8 +10,8 @@ import {
     ThreadSortBy,
     ThreadStatus,
 } from '@langgraph-js/sdk';
-import { SqliteSaver } from './checkpoint.js';
-import { DatabaseType } from './DB.js';
+import type { SqliteSaver } from './checkpoint.js';
+import type { DatabaseType } from './type.js';
 interface ThreadRow {
     thread_id: string;
     created_at: string;
