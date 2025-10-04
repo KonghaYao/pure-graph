@@ -35,6 +35,9 @@ export class RedisStreamQueue extends BaseStreamQueue implements BaseStreamQueue
         // 推送到队列
         await this.redis.lpush(this.queueKey, serializedData);
 
+        // 设置队列 TTL 为 300 秒
+        await this.redis.expire(this.queueKey, 300);
+
         // 发布到频道通知有新数据
         await this.redis.publish(this.channelKey, serializedData);
 
