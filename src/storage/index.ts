@@ -1,4 +1,4 @@
-import { StreamQueueManager } from '../queue/stream_queue';
+import { BaseStreamQueueInterface, StreamQueueManager } from '../queue/stream_queue';
 import { MemorySaver } from './memory/checkpoint';
 import { MemoryStreamQueue } from './memory/queue';
 import { MemoryThreadsManager } from './memory/threads';
@@ -16,8 +16,15 @@ export const createCheckPointer = async () => {
     return new MemorySaver();
 };
 
-export const createMessageQueue = () => {
-    const q: new (compressMessages: boolean) => MemoryStreamQueue = MemoryStreamQueue;
+export const createMessageQueue = async () => {
+    let q: new (id: string) => BaseStreamQueueInterface;
+    if (process.env.REDIS_URL) {
+        console.log('Using redis as stream queue');
+        const { RedisStreamQueue } = await import('./redis/queue');
+        q = RedisStreamQueue;
+    } else {
+        q = MemoryStreamQueue;
+    }
     return new StreamQueueManager(q);
 };
 

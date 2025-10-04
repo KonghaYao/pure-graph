@@ -26,7 +26,7 @@ export class BaseStreamQueue extends EventEmitter<StreamQueueEvents<EventMessage
      * Constructor
      * @param compressMessages 是否压缩消息 / Whether to compress messages
      */
-    constructor(readonly compressMessages: boolean = true) {
+    constructor(readonly id: string, readonly compressMessages: boolean = true) {
         super();
     }
 
@@ -58,6 +58,7 @@ export class BaseStreamQueue extends EventEmitter<StreamQueueEvents<EventMessage
  * Base stream queue interface
  */
 export interface BaseStreamQueueInterface {
+    id: string;
     /** 是否压缩消息 / Whether to compress messages */
     compressMessages: boolean;
     /**
@@ -76,7 +77,7 @@ export interface BaseStreamQueueInterface {
      * @param listener 数据变化监听器 / Data change listener
      * @returns 取消监听函数 / Unsubscribe function
      */
-    onDataChange(listener: (data: EventMessage) => void): () => void;
+    onDataReceive(): AsyncGenerator<EventMessage, void, unknown>;
     /** 取消信号控制器 / Cancel signal controller */
     cancelSignal: AbortController;
     /** 取消操作 / Cancel operation */
@@ -93,7 +94,7 @@ export class StreamQueueManager<Q extends BaseStreamQueueInterface> {
     /** 默认是否压缩消息 / Default compress messages setting */
     private defaultCompressMessages: boolean;
     /** 队列构造函数 / Queue constructor */
-    private queueConstructor: new (compressMessages: boolean) => Q;
+    private queueConstructor: new (queueId: string) => Q;
 
     /**
      * 构造函数
@@ -102,7 +103,7 @@ export class StreamQueueManager<Q extends BaseStreamQueueInterface> {
      * @param options 配置选项 / Configuration options
      */
     constructor(
-        queueConstructor: new (compressMessages: boolean) => Q,
+        queueConstructor: new (id: string) => Q,
         options: {
             /** 默认是否压缩消息 / Default compress messages setting */
             defaultCompressMessages?: boolean;
@@ -121,7 +122,7 @@ export class StreamQueueManager<Q extends BaseStreamQueueInterface> {
      */
     createQueue(id: string, compressMessages?: boolean): Q {
         const compress = compressMessages ?? this.defaultCompressMessages;
-        this.queues.set(id, new this.queueConstructor(compress));
+        this.queues.set(id, new this.queueConstructor(id));
         return this.queues.get(id)!;
     }
 
