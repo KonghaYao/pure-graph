@@ -8,6 +8,22 @@ import { SQLiteThreadsManager } from './sqlite/threads';
 // 所有的适配实现，都请写到这里，通过环境变量进行判断使用哪种方式进行适配
 
 export const createCheckPointer = async () => {
+    if (
+        (process.env.REDIS_URL && process.env.CHECKPOINT_TYPE === 'redis') ||
+        process.env.CHECKPOINT_TYPE === 'shallow/redis'
+    ) {
+        if (process.env.CHECKPOINT_TYPE === 'redis') {
+            const { RedisSaver } = await import('@langchain/langgraph-checkpoint-redis');
+            return await RedisSaver.fromUrl(process.env.REDIS_URL!, {
+                defaultTTL: 60, // TTL in minutes
+                refreshOnRead: true,
+            });
+        }
+        if (process.env.CHECKPOINT_TYPE === 'shallow/redis') {
+            const { ShallowRedisSaver } = await import('@langchain/langgraph-checkpoint-redis/shallow');
+            return await ShallowRedisSaver.fromUrl(process.env.REDIS_URL!);
+        }
+    }
     if (process.env.SQLITE_DATABASE_URI) {
         const { SqliteSaver } = await import('./sqlite/checkpoint');
         const db = SqliteSaver.fromConnString(process.env.SQLITE_DATABASE_URI);

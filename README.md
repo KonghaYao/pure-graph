@@ -30,3 +30,15 @@ app.route('/', LangGraphApp);
 
 export default app;
 ```
+
+## env
+
+```sh
+SQLITE_DATABASE_URI=./.langgraph_api/chat.db
+
+CHECKPOINT_TYPE=postgres #
+CHECKPOINT_TYPE=redis #
+CHECKPOINT_TYPE=shallow/redis #
+
+REDIS_URL=""
+```
