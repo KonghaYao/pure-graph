@@ -1,16 +1,16 @@
 import { CancelEventMessage, EventMessage } from '../../queue/event_message.js';
 import { BaseStreamQueue } from '../../queue/stream_queue.js';
 import { BaseStreamQueueInterface } from '../../queue/stream_queue.js';
-import Redis from 'ioredis';
+import { createClient, RedisClientType } from 'redis';
 
 /**
  * Redis 实现的消息队列，用于存储消息
  */
 export class RedisStreamQueue extends BaseStreamQueue implements BaseStreamQueueInterface {
-    static redis = new Redis(process.env.REDIS_URL!);
-    static subscriberRedis = new Redis(process.env.REDIS_URL!);
-    private redis: Redis;
-    private subscriberRedis: Redis;
+    static redis: RedisClientType = createClient({ url: process.env.REDIS_URL! });
+    static subscriberRedis: RedisClientType = createClient({ url: process.env.REDIS_URL! });
+    private redis: RedisClientType;
+    private subscriberRedis: RedisClientType;
     private queueKey: string;
     private channelKey: string;
     private isConnected = false;
@@ -23,6 +23,11 @@ export class RedisStreamQueue extends BaseStreamQueue implements BaseStreamQueue
         this.redis = RedisStreamQueue.redis;
         this.subscriberRedis = RedisStreamQueue.subscriberRedis;
         this.cancelSignal = new AbortController();
+
+        // 连接 Redis 客户端
+        this.redis.connect();
+        this.subscriberRedis.connect();
+        this.isConnected = true;
     }
 
     /**
@@ -33,7 +38,7 @@ export class RedisStreamQueue extends BaseStreamQueue implements BaseStreamQueue
         const serializedData = Buffer.from(data);
 
         // 推送到队列
-        await this.redis.lpush(this.queueKey, serializedData);
+        await this.redis.lPush(this.queueKey, serializedData);
 
         // 设置队列 TTL 为 300 秒
         await this.redis.expire(this.queueKey, 300);
@@ -80,11 +85,8 @@ export class RedisStreamQueue extends BaseStreamQueue implements BaseStreamQueue
         };
 
         // 订阅 Redis 频道
-        await this.subscriberRedis.subscribe(this.channelKey);
-        this.subscriberRedis.on('message', (channel, message) => {
-            if (channel === this.channelKey) {
-                handleMessage(message);
-            }
+        await this.subscriberRedis.subscribe(this.channelKey, (message) => {
+            handleMessage(message);
         });
 
         try {
@@ -109,7 +111,11 @@ export class RedisStreamQueue extends BaseStreamQueue implements BaseStreamQueue
      * 获取队列中的所有数据
      */
     async getAll(): Promise<EventMessage[]> {
-        const data = await this.redis.lrange(this.queueKey, 0, -1);
+        const data = await this.redis.lRange(this.queueKey, 0, -1);
+
+        if (!data || data.length === 0) {
+            return [];
+        }
 
         if (this.compressMessages) {
             return (await Promise.all(
@@ -119,7 +125,7 @@ export class RedisStreamQueue extends BaseStreamQueue implements BaseStreamQueue
                 }),
             )) as EventMessage[];
         } else {
-            return data.map((item) => JSON.parse(item) as EventMessage);
+            return data.map((item: string) => JSON.parse(item) as EventMessage);
         }
     }
 
