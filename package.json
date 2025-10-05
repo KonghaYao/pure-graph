@@ -1,11 +1,11 @@
 {
     "name": "@langgraph-js/pure-graph",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "",
     "main": "dist/index.js",
     "scripts": {
         "dev": "bun run test/hono.ts",
-        "build": "rm -r dist && tsc",
+        "build": " tsc",
         "prepublish": "pnpm build"
     },
     "keywords": [],
