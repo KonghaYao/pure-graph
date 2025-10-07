@@ -9,6 +9,7 @@ import {
     OnConflictBehavior,
     ThreadStatus,
     Checkpoint,
+    Config,
 } from '@langchain/langgraph-sdk';
 import { StreamEvent } from '@langchain/core/tracers/log_stream';
 import { EventMessage } from './queue/event_message';
@@ -87,6 +88,7 @@ export interface ILangGraphClient<TStateType = unknown> {
         }): Promise<Thread<TStateType>[]>;
         get(threadId: string): Promise<Thread<TStateType>>;
         delete(threadId: string): Promise<void>;
+        updateState(threadId: string, thread: Partial<Thread<TStateType>>): Promise<Pick<Config, 'configurable'>>;
     };
     runs: {
         list(

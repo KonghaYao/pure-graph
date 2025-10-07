@@ -1,6 +1,7 @@
 import { BaseThreadsManager } from '../../threads/index.js';
 import {
     Command,
+    Config,
     Metadata,
     OnConflictBehavior,
     Run,
@@ -12,6 +13,8 @@ import {
 } from '@langgraph-js/sdk';
 import type { SqliteSaver } from './checkpoint.js';
 import type { DatabaseType } from './type.js';
+import { getGraph } from '../../utils/getGraph.js';
+import { serialiseAsDict } from '../../graph/stream.js';
 interface ThreadRow {
     thread_id: string;
     created_at: string;
@@ -33,12 +36,11 @@ interface RunRow {
     multitask_strategy: string;
 }
 
-export class SQLiteThreadsManager<ValuesType = unknown> extends BaseThreadsManager {
+export class SQLiteThreadsManager<ValuesType = unknown> implements BaseThreadsManager<ValuesType> {
     db: DatabaseType;
     private isSetup: boolean = false;
 
     constructor(checkpointer: SqliteSaver) {
-        super();
         this.db = checkpointer.db;
         this.setup();
     }
@@ -252,6 +254,43 @@ export class SQLiteThreadsManager<ValuesType = unknown> extends BaseThreadsManag
                 )
                 .run(...values);
         }
+    }
+    async updateState(threadId: string, thread: Partial<Thread<ValuesType>>): Promise<Pick<Config, 'configurable'>> {
+        // 从数据库查询线程信息
+        const row = this.db.prepare('SELECT * FROM threads WHERE thread_id = ?').get(threadId) as ThreadRow;
+        if (!row) {
+            throw new Error(`Thread with ID ${threadId} not found.`);
+        }
+
+        const targetThread = {
+            thread_id: row.thread_id,
+            created_at: row.created_at,
+            updated_at: row.updated_at,
+            metadata: JSON.parse(row.metadata),
+            status: row.status as ThreadStatus,
+            values: row.values ? JSON.parse(row.values) : (null as unknown as ValuesType),
+            interrupts: JSON.parse(row.interrupts),
+        };
+
+        if (targetThread.status === 'busy') {
+            throw new Error(`Thread with ID ${threadId} is busy, can't update state.`);
+        }
+
+        if (!targetThread.metadata?.graph_id) {
+            throw new Error(`Thread with ID ${threadId} has no graph_id.`);
+        }
+        const graphId = targetThread.metadata?.graph_id as string;
+        const config = {
+            configurable: {
+                thread_id: threadId,
+                graph_id: graphId,
+            },
+        };
+        const graph = await getGraph(graphId, config);
+        const nextConfig = await graph.updateState(config, thread.values);
+        const graphState = await graph.getState(config);
+        await this.set(threadId, { values: JSON.parse(serialiseAsDict(graphState.values)) as ValuesType });
+        return nextConfig;
     }
     async delete(threadId: string): Promise<void> {
         const result = this.db.prepare('DELETE FROM threads WHERE thread_id = ?').run(threadId);

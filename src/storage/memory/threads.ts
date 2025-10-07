@@ -1,6 +1,7 @@
 import { BaseThreadsManager } from '../../threads/index.js';
 import {
     Command,
+    Config,
     Metadata,
     OnConflictBehavior,
     Run,
@@ -10,8 +11,10 @@ import {
     ThreadSortBy,
     ThreadStatus,
 } from '@langgraph-js/sdk';
+import { getGraph } from '../../utils/getGraph.js';
+import { serialiseAsDict } from '../../graph/stream.js';
 
-export class MemoryThreadsManager<ValuesType = unknown> extends BaseThreadsManager {
+export class MemoryThreadsManager<ValuesType = unknown> implements BaseThreadsManager<ValuesType> {
     private threads: Thread<ValuesType>[] = [];
 
     async create(payload?: {
@@ -114,6 +117,32 @@ export class MemoryThreadsManager<ValuesType = unknown> extends BaseThreadsManag
         if (this.threads.length === initialLength) {
             throw new Error(`Thread with ID ${threadId} not found.`);
         }
+    }
+    async updateState(threadId: string, thread: Partial<Thread<ValuesType>>): Promise<Pick<Config, 'configurable'>> {
+        const index = this.threads.findIndex((t) => t.thread_id === threadId) as number;
+        if (index === -1) {
+            throw new Error(`Thread with ID ${threadId} not found.`);
+        }
+        const targetThread = this.threads[index];
+        if (targetThread.status === 'busy') {
+            throw new Error(`Thread with ID ${threadId} is busy, can't update state.`);
+        }
+        this.threads[index] = { ...targetThread, values: thread.values as ValuesType };
+        if (!targetThread.metadata?.graph_id) {
+            throw new Error(`Thread with ID ${threadId} has no graph_id.`);
+        }
+        const graphId = targetThread.metadata?.graph_id as string;
+        const config = {
+            configurable: {
+                thread_id: threadId,
+                graph_id: graphId,
+            },
+        };
+        const graph = await getGraph(graphId, config);
+        const nextConfig = await graph.updateState(config, thread.values);
+        const graphState = await graph.getState(config);
+        await this.set(threadId, { values: JSON.parse(serialiseAsDict(graphState.values)) as ValuesType });
+        return nextConfig;
     }
     runs: Run[] = [];
     async createRun(threadId: string, assistantId: string, payload?: { metadata?: Metadata }): Promise<Run> {

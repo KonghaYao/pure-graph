@@ -133,3 +133,12 @@ export const ThreadSearchPayloadSchema = z
         sort_order: z.enum(['asc', 'desc']).describe('Sort order.').optional(),
     })
     .describe('Payload for listing threads.');
+
+export const ThreadStateUpdate = z
+    .object({
+        values: z.union([z.record(z.string(), z.unknown()), z.array(z.record(z.string(), z.unknown()))]).nullish(),
+        // as_node: z.string().optional(),
+        // checkpoint_id: z.string().optional(),
+        // checkpoint: CheckpointSchema.nullish(),
+    })
+    .describe('Payload for adding state to a thread.');

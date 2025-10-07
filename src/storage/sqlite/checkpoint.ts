@@ -296,7 +296,6 @@ CREATE TABLE IF NOT EXISTS writes (
         whereClause.push(
             ...Object.entries(sanitizedFilter).map(([key]) => `jsonb(CAST(metadata AS TEXT))->'$.${key}' = ?`),
         );
-
         if (whereClause.length > 0) {
             sql += `WHERE\n  ${whereClause.join(' AND\n  ')}\n`;
         }

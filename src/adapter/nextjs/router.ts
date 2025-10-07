@@ -9,6 +9,7 @@ import {
     RunCancelQuerySchema,
     ThreadCreatePayloadSchema,
     ThreadSearchPayloadSchema,
+    ThreadStateUpdate,
 } from '../zod';
 import { serialiseAsDict } from '../../graph/stream';
 
@@ -139,6 +140,18 @@ export async function POST(req: NextRequest) {
         return NextResponse.json(result, {
             headers: { 'X-Pagination-Total': String(result.length) },
         });
+    }
+
+    // Threads state update
+    if (pathname.match(/\/threads\/[0-9a-fA-F-]{36}\/state$/)) {
+        const match = pathname.match(/\/threads\/([0-9a-fA-F-]{36})\/state$/);
+        if (match) {
+            const thread_id = match[1];
+            const body = await req.json();
+            const payload = ThreadStateUpdate.parse(body);
+            const result = await client.threads.updateState(thread_id, payload);
+            return NextResponse.json(result);
+        }
     }
 
     // Runs routes - stream

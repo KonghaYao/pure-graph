@@ -9,8 +9,11 @@ import {
     RunStreamPayloadSchema,
     RunListQuerySchema,
     RunCancelQuerySchema,
+    ThreadStateUpdate,
 } from '../zod';
 import { serialiseAsDict } from '../../graph/stream';
+import { RunnableConfig } from '@langchain/core/runnables';
+import z from 'zod';
 
 const api = new Hono();
 
@@ -62,4 +65,28 @@ api.post(
     },
 );
 
+api.post(
+    '/threads/:thread_id/state',
+    zValidator('param', z.object({ thread_id: z.string().uuid() })),
+    zValidator('json', ThreadStateUpdate),
+    async (c) => {
+        // Update Thread State
+        const { thread_id } = c.req.valid('param');
+        const payload = c.req.valid('json');
+        // const config: RunnableConfig = { configurable: { thread_id } };
+
+        // if (payload.checkpoint_id) {
+        //     config.configurable ??= {};
+        //     config.configurable.checkpoint_id = payload.checkpoint_id;
+        // }
+        // if (payload.checkpoint) {
+        //     config.configurable ??= {};
+        //     Object.assign(config.configurable, payload.checkpoint);
+        // }
+
+        const inserted = await client.threads.updateState(thread_id, payload);
+
+        return c.json(inserted);
+    },
+);
 export default api;
