@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
         const match = pathname.match(/\/assistants\/([^/]+)\/graph$/);
         if (match) {
             const assistant_id = match[1];
-            const xrayParam = url.searchParams.get('xray');
+            const xrayParam = url.searchParams.get('xray') ?? undefined;
             const queryParams = { xray: xrayParam };
             const { xray } = AssistantGraphQuerySchema.parse(queryParams);
             const data = await client.assistants.getGraph(assistant_id, {
@@ -74,9 +74,9 @@ export async function GET(req: NextRequest) {
         const match = pathname.match(/\/threads\/([0-9a-fA-F-]{36})\/runs$/);
         if (match) {
             const thread_id = match[1];
-            const limit = url.searchParams.get('limit');
-            const offset = url.searchParams.get('offset');
-            const status = url.searchParams.get('status');
+            const limit = url.searchParams.get('limit') ?? undefined;
+            const offset = url.searchParams.get('offset') ?? undefined;
+            const status = url.searchParams.get('status') ?? undefined;
             const queryParams = { limit, offset, status };
             const {
                 limit: parsedLimit,
@@ -172,8 +172,8 @@ export async function POST(req: NextRequest) {
         if (match) {
             const thread_id = match[1];
             const run_id = match[2];
-            const waitParam = url.searchParams.get('wait');
-            const actionParam = url.searchParams.get('action');
+            const waitParam = url.searchParams.get('wait') ?? undefined;
+            const actionParam = url.searchParams.get('action') ?? undefined;
             const queryParams = {
                 wait: waitParam ? waitParam === 'true' : false,
                 action: actionParam ?? 'interrupt',
