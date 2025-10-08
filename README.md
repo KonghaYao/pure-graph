@@ -84,27 +84,27 @@ To integrate Pure Graph into a Hono.js project, follow these steps:
 
 Here are the environment variables you need to configure:
 
-- `SQLITE_DATABASE_URI`: Path to your SQLite database.
-- `CHECKPOINT_TYPE`: Type of checkpoint storage (e.g., `postgres`, `redis`, `shallow/redis`).
-- `REDIS_URL`: URL for Redis (required if using Redis).
+-   `SQLITE_DATABASE_URI`: Path to your SQLite database.
+-   `CHECKPOINT_TYPE`: Type of checkpoint storage (e.g., `postgres`, `redis`, `shallow/redis`).
+-   `REDIS_URL`: URL for Redis (required if using Redis).
 
 ## API Endpoints
 
 ### Assistants
 
-- **GET /assistants**: Search for assistants.
-- **GET /assistants/{assistantId}**: Retrieve a specific assistant graph.
+-   **GET /assistants**: Search for assistants.
+-   **GET /assistants/{assistantId}**: Retrieve a specific assistant graph.
 
 ### Threads
 
-- **POST /threads**: Create a new thread.
-- **GET /threads**: Search for threads.
-- **GET /threads/{threadId}**: Retrieve a specific thread.
-- **DELETE /threads/{threadId}**: Delete a specific thread.
+-   **POST /threads**: Create a new thread.
+-   **GET /threads**: Search for threads.
+-   **GET /threads/{threadId}**: Retrieve a specific thread.
+-   **DELETE /threads/{threadId}**: Delete a specific thread.
 
 ### Runs
 
-- **GET /threads/{threadId}/runs**: List runs in a thread.
-- **POST /threads/{threadId}/runs**: Create a new run.
-- **DELETE /threads/{threadId}/runs/{runId}**: Cancel a specific run.
-- **GET /threads/{threadId}/runs/{runId}/stream**: Stream run data.
+-   **GET /threads/{threadId}/runs**: List runs in a thread.
+-   **POST /threads/{threadId}/runs**: Create a new run.
+-   **DELETE /threads/{threadId}/runs/{runId}**: Cancel a specific run.
+-   **GET /threads/{threadId}/runs/{runId}/stream**: Stream run data.

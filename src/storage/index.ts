@@ -3,6 +3,7 @@ import { MemorySaver } from './memory/checkpoint';
 import { MemoryStreamQueue } from './memory/queue';
 import { MemoryThreadsManager } from './memory/threads';
 import type { SqliteSaver as SqliteSaverType } from './sqlite/checkpoint';
+import type { PostgresSaver } from '@langchain/langgraph-checkpoint-postgres';
 import { SQLiteThreadsManager } from './sqlite/threads';
 
 // 所有的适配实现，都请写到这里，通过环境变量进行判断使用哪种方式进行适配
@@ -13,6 +14,7 @@ export const createCheckPointer = async () => {
         process.env.CHECKPOINT_TYPE === 'shallow/redis'
     ) {
         if (process.env.CHECKPOINT_TYPE === 'redis') {
+            console.log('Using redis as checkpoint');
             const { RedisSaver } = await import('@langchain/langgraph-checkpoint-redis');
             return await RedisSaver.fromUrl(process.env.REDIS_URL!, {
                 defaultTTL: 60, // TTL in minutes
@@ -20,11 +22,20 @@ export const createCheckPointer = async () => {
             });
         }
         if (process.env.CHECKPOINT_TYPE === 'shallow/redis') {
+            console.log('Using shallow redis as checkpoint');
             const { ShallowRedisSaver } = await import('@langchain/langgraph-checkpoint-redis/shallow');
             return await ShallowRedisSaver.fromUrl(process.env.REDIS_URL!);
         }
     }
+
+    if (process.env.DATABASE_URL) {
+        console.log('Using postgres as checkpoint');
+        const { createPGCheckpoint } = await import('./pg/checkpoint');
+        return createPGCheckpoint();
+    }
+
     if (process.env.SQLITE_DATABASE_URI) {
+        console.log('Using sqlite as checkpoint');
         const { SqliteSaver } = await import('./sqlite/checkpoint');
         const db = SqliteSaver.fromConnString(process.env.SQLITE_DATABASE_URI);
         return db;
@@ -44,9 +55,13 @@ export const createMessageQueue = async () => {
     return new StreamQueueManager(q);
 };
 
-export const createThreadManager = (config: { checkpointer?: SqliteSaverType }) => {
+export const createThreadManager = async (config: { checkpointer?: SqliteSaverType | PostgresSaver }) => {
+    if (process.env.DATABASE_URL && config.checkpointer) {
+        const { PostgresThreadsManager } = await import('./pg/threads');
+        return new PostgresThreadsManager(config.checkpointer as PostgresSaver);
+    }
     if (process.env.SQLITE_DATABASE_URI && config.checkpointer) {
-        return new SQLiteThreadsManager(config.checkpointer);
+        return new SQLiteThreadsManager(config.checkpointer as SqliteSaverType);
     }
     return new MemoryThreadsManager();
 };
