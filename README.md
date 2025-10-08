@@ -1,6 +1,13 @@
 # Pure Graph
 
-Pure Graph is a library that provides a standard LangGraph endpoint for integrating into various frameworks like NextJS and Hono.js. This document will guide you on how to use Pure Graph in your projects.
+Pure Graph is a library that provides a standard LangGraph endpoint for integrating into various frameworks like NextJS and Hono.js. It supports multiple storage backends (SQLite, PostgreSQL, Redis) and message queues. This document will guide you on how to use Pure Graph in your projects.
+
+## Features
+
+-   **Multiple Storage Backends**: Support for SQLite, PostgreSQL, Redis, and in-memory storage
+-   **Message Queue**: Redis-based stream queue with TTL support
+-   **Thread Management**: Comprehensive thread lifecycle management with status tracking
+-   **Framework Integration**: Native support for Next.js and Hono.js frameworks
 
 ## Installation
 
@@ -84,9 +91,10 @@ To integrate Pure Graph into a Hono.js project, follow these steps:
 
 Here are the environment variables you need to configure:
 
--   `SQLITE_DATABASE_URI`: Path to your SQLite database.
--   `CHECKPOINT_TYPE`: Type of checkpoint storage (e.g., `postgres`, `redis`, `shallow/redis`).
--   `REDIS_URL`: URL for Redis (required if using Redis).
+-   `SQLITE_DATABASE_URI`: Path to your SQLite database (e.g., `./.langgraph_api/chat.db`).
+-   `DATABASE_URL`: PostgreSQL connection string (required for PostgreSQL checkpoint storage).
+-   `CHECKPOINT_TYPE`: Type of checkpoint storage (optional, defaults to memory; options: `postgres`, `redis`, `shallow/redis`).
+-   `REDIS_URL`: URL for Redis (required if using Redis checkpoint or message queue).
 
 ## API Endpoints
 
