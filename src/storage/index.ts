@@ -14,7 +14,7 @@ export const createCheckPointer = async () => {
         process.env.CHECKPOINT_TYPE === 'shallow/redis'
     ) {
         if (process.env.CHECKPOINT_TYPE === 'redis') {
-            console.log('Using redis as checkpoint');
+            console.debug('LG | Using redis as checkpoint');
             const { RedisSaver } = await import('@langchain/langgraph-checkpoint-redis');
             return await RedisSaver.fromUrl(process.env.REDIS_URL!, {
                 defaultTTL: 60, // TTL in minutes
@@ -22,20 +22,20 @@ export const createCheckPointer = async () => {
             });
         }
         if (process.env.CHECKPOINT_TYPE === 'shallow/redis') {
-            console.log('Using shallow redis as checkpoint');
+            console.debug('LG | Using shallow redis as checkpoint');
             const { ShallowRedisSaver } = await import('@langchain/langgraph-checkpoint-redis/shallow');
             return await ShallowRedisSaver.fromUrl(process.env.REDIS_URL!);
         }
     }
 
     if (process.env.DATABASE_URL) {
-        console.log('Using postgres as checkpoint');
+        console.debug('LG | Using postgres as checkpoint');
         const { createPGCheckpoint } = await import('./pg/checkpoint');
         return createPGCheckpoint();
     }
 
     if (process.env.SQLITE_DATABASE_URI) {
-        console.log('Using sqlite as checkpoint');
+        console.debug('LG | Using sqlite as checkpoint');
         const { SqliteSaver } = await import('./sqlite/checkpoint');
         const db = SqliteSaver.fromConnString(process.env.SQLITE_DATABASE_URI);
         return db;
@@ -46,7 +46,7 @@ export const createCheckPointer = async () => {
 export const createMessageQueue = async () => {
     let q: new (id: string) => BaseStreamQueueInterface;
     if (process.env.REDIS_URL) {
-        console.log('Using redis as stream queue');
+        console.debug('LG | Using redis as stream queue');
         const { RedisStreamQueue } = await import('./redis/queue');
         q = RedisStreamQueue;
     } else {
@@ -58,10 +58,16 @@ export const createMessageQueue = async () => {
 export const createThreadManager = async (config: { checkpointer?: SqliteSaverType | PostgresSaver }) => {
     if (process.env.DATABASE_URL && config.checkpointer) {
         const { PostgresThreadsManager } = await import('./pg/threads');
-        return new PostgresThreadsManager(config.checkpointer as PostgresSaver);
+        const threadsManager = new PostgresThreadsManager(config.checkpointer as PostgresSaver);
+        if (process.env.DATABASE_INIT === 'true') {
+            await threadsManager.setup();
+        }
+        return threadsManager;
     }
     if (process.env.SQLITE_DATABASE_URI && config.checkpointer) {
-        return new SQLiteThreadsManager(config.checkpointer as SqliteSaverType);
+        const threadsManager = new SQLiteThreadsManager(config.checkpointer as SqliteSaverType);
+        await threadsManager.setup();
+        return threadsManager;
     }
     return new MemoryThreadsManager();
 };

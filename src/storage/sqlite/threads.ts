@@ -42,10 +42,9 @@ export class SQLiteThreadsManager<ValuesType = unknown> implements BaseThreadsMa
 
     constructor(checkpointer: SqliteSaver) {
         this.db = checkpointer.db;
-        this.setup();
     }
 
-    private setup(): void {
+    async setup() {
         if (this.isSetup) {
             return;
         }

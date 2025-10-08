@@ -12,6 +12,7 @@ import {
 } from '@langgraph-js/sdk';
 
 export interface BaseThreadsManager<ValuesType = unknown> {
+    setup(): Promise<void>;
     create(payload?: {
         metadata?: Metadata;
         threadId?: string;

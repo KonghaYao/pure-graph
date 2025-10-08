@@ -44,10 +44,9 @@ export class PostgresThreadsManager<ValuesType = unknown> implements BaseThreads
     constructor(checkpointer: PostgresSaver) {
         // 访问 PostgresSaver 的 pool 属性（虽然是 private，但在运行时可以访问）
         this.pool = (checkpointer as any).pool;
-        this.setup();
     }
 
-    private async setup(): Promise<void> {
+    public async setup(): Promise<void> {
         if (this.isSetup) {
             return;
         }

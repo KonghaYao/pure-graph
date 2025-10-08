@@ -16,6 +16,9 @@ import { serialiseAsDict } from '../../graph/stream.js';
 
 export class MemoryThreadsManager<ValuesType = unknown> implements BaseThreadsManager<ValuesType> {
     private threads: Thread<ValuesType>[] = [];
+    async setup() {
+        return;
+    }
 
     async create(payload?: {
         metadata?: Metadata;
