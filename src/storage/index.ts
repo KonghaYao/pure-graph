@@ -5,6 +5,7 @@ import { MemoryThreadsManager } from './memory/threads';
 import type { SqliteSaver as SqliteSaverType } from './sqlite/checkpoint';
 import type { PostgresSaver } from '@langchain/langgraph-checkpoint-postgres';
 import { SQLiteThreadsManager } from './sqlite/threads';
+import { PostgresThreadsManager } from './pg/threads';
 
 // 所有的适配实现，都请写到这里，通过环境变量进行判断使用哪种方式进行适配
 
@@ -57,7 +58,7 @@ export const createMessageQueue = async () => {
 
 export const createThreadManager = async (config: { checkpointer?: SqliteSaverType | PostgresSaver }) => {
     if (process.env.DATABASE_URL && config.checkpointer) {
-        const { PostgresThreadsManager } = await import('./pg/threads');
+        // 这里直接引入避免循环引用问题
         const threadsManager = new PostgresThreadsManager(config.checkpointer as PostgresSaver);
         if (process.env.DATABASE_INIT === 'true') {
             await threadsManager.setup();

@@ -11,9 +11,9 @@
         "resolveJsonModule": true,
         "isolatedModules": true,
         "jsx": "preserve",
-        "incremental": true,
         "outDir": "./dist",
-        "declaration": true
+        "declaration": true,
+        "emitDeclarationOnly": true
     },
     "include": ["src/**/*.ts"],
     "exclude": ["node_modules"]
