@@ -76,14 +76,14 @@ export const createEndpoint = (): ILangGraphClient => {
                 return LangGraphGlobal.globalMessageQueue.cancelQueue(runId);
             },
             async *stream(threadId: string, assistantId: string, payload: StreamInputData) {
-                if (!payload.config) {
-                    payload.config = {
-                        configurable: {
-                            graph_id: assistantId,
-                            thread_id: threadId,
-                        },
-                    };
-                }
+                payload.config = {
+                    ...(payload.config ?? {}),
+                    configurable: {
+                        ...(payload.config?.configurable ?? {}),
+                        graph_id: assistantId,
+                        thread_id: threadId,
+                    },
+                };
 
                 for await (const data of streamState(
                     threads,

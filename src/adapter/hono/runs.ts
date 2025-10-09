@@ -12,10 +12,10 @@ import {
     ThreadStateUpdate,
 } from '../zod';
 import { serialiseAsDict } from '../../graph/stream';
-import { RunnableConfig } from '@langchain/core/runnables';
 import z from 'zod';
+import type { LangGraphServerContext } from './index';
 
-const api = new Hono();
+const api = new Hono<{ Variables: LangGraphServerContext }>();
 
 // 最常用的对话接口
 api.post(
@@ -29,6 +29,12 @@ api.post(
 
         // c.header('Content-Location', `/threads/${thread_id}/runs/${run.run_id}`);
         return streamSSE(c, async (stream) => {
+            payload.config = payload.config || {};
+            payload.config.configurable = payload.config.configurable || {};
+            const langgraphContext = c.get('langgraph_context');
+            if (langgraphContext) {
+                Object.assign(payload.config.configurable, langgraphContext);
+            }
             /** @ts-ignore zod v3 的问题，与 ts 类型不一致 */
             for await (const { event, data } of client.runs.stream(thread_id, payload.assistant_id, payload)) {
                 await stream.writeSSE({ data: serialiseAsDict(data) ?? '', event });

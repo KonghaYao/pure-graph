@@ -161,6 +161,17 @@ export async function POST(req: NextRequest) {
             const thread_id = match[1];
             const body = await req.json();
             const payload = RunStreamPayloadSchema.parse(body);
+
+            // Extract custom context from request headers
+            const langgraphContextHeader = req.headers.get('x-langgraph-context');
+            console.log(langgraphContextHeader);
+            if (langgraphContextHeader) {
+                const langgraphContext = JSON.parse(decodeURIComponent(langgraphContextHeader));
+                payload.config = payload.config || {};
+                payload.config.configurable = payload.config.configurable || {};
+                Object.assign(payload.config.configurable, langgraphContext);
+            }
+
             const generator = client.runs.stream(thread_id, payload.assistant_id as string, payload as any);
             return sseResponse(generator as any);
         }

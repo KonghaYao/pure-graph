@@ -112,17 +112,71 @@ To integrate Pure Graph into a Hono.js project, follow these steps:
     import { registerGraph } from '@langgraph-js/pure-graph';
     import { graph } from './agent/graph-name/graph';
     import { Hono } from 'hono';
-    import LangGraphApp from '@langgraph-js/pure-graph/dist/adapter/hono/index';
+    import LangGraphApp, { type LangGraphServerContext } from '@langgraph-js/pure-graph/dist/adapter/hono/index';
 
     registerGraph('test', graph);
 
-    const app = new Hono();
+    const app = new Hono<{ Variables: LangGraphServerContext }>();
+
     app.route('/', LangGraphApp);
 
     export default app;
     ```
 
-2. **Configure Environment Variables**
+2. **Using LangGraph Entrypoint (Recommended)**
+
+    For more advanced use cases, you can use LangGraph's `entrypoint` function to create reusable workflows:
+
+    ```ts
+    // agent/entrypoint-graph.ts
+    import { Annotation, entrypoint, getConfig } from '@langchain/langgraph';
+    import { createReactAgent, createReactAgentAnnotation } from '@langchain/langgraph/prebuilt';
+    import { createState } from '@langgraph-js/pro';
+    import { createEntrypointGraph } from '@langgraph-js/pure-graph';
+    import { ChatOpenAI } from '@langchain/openai';
+
+    const State = createState(createReactAgentAnnotation()).build({});
+
+    const workflow = entrypoint('my-entrypoint', async (state: typeof State.State) => {
+        // Access context set by middleware
+        const config = getConfig();
+        console.log('User ID from context:', config.configurable?.userId);
+
+        const agent = createReactAgent({
+            llm: new ChatOpenAI({
+                model: 'your-model',
+            }),
+            prompt: 'You are a helpful assistant',
+            tools: [], // Add your tools here
+        });
+
+        return agent.invoke(state);
+    });
+
+    export const graph = createEntrypointGraph({
+        stateSchema: State,
+        graph: workflow,
+    });
+    ```
+
+    ```ts
+    // app.ts
+    import { registerGraph } from '@langgraph-js/pure-graph';
+    import { graph as entrypointGraph } from './agent/entrypoint-graph';
+    import { Hono } from 'hono';
+    import LangGraphApp, { type LangGraphServerContext } from '@langgraph-js/pure-graph/dist/adapter/hono/index';
+
+    // Register your entrypoint graph
+    registerGraph('my-entrypoint', entrypointGraph);
+
+    const app = new Hono<{ Variables: LangGraphServerContext }>();
+
+    app.route('/', LangGraphApp);
+
+    export default app;
+    ```
+
+3. **Configure Environment Variables**
 
     Add the necessary environment variables to your `.env` file.
 
@@ -131,6 +185,151 @@ To integrate Pure Graph into a Hono.js project, follow these steps:
     CHECKPOINT_TYPE=postgres # or redis, shallow/redis
     REDIS_URL="" # Required if using Redis
     ```
+
+## Context Passing
+
+Pure Graph supports passing custom context data to your graphs, which can be accessed via `getConfig().configurable` in your graph logic. This allows you to inject user-specific data, session information, or any other custom data into your LangGraph workflows.
+
+### Graph Code Example
+
+Here's how to access context in your graph logic:
+
+```ts
+// agent/context-aware-graph.ts
+import { Annotation, entrypoint, getConfig } from '@langchain/langgraph';
+import { createReactAgent, createReactAgentAnnotation } from '@langchain/langgraph/prebuilt';
+import { createState } from '@langgraph-js/pro';
+import { createEntrypointGraph } from '@langgraph-js/pure-graph';
+import { ChatOpenAI } from '@langchain/openai';
+
+const State = createState(createReactAgentAnnotation()).build({});
+
+const workflow = entrypoint('context-aware-graph', async (state: typeof State.State) => {
+    // Access context data passed from middleware
+    const config = getConfig();
+
+    // Context is available in config.configurable
+    const userId = config.configurable?.userId;
+    const sessionId = config.configurable?.sessionId;
+    const preferences = config.configurable?.preferences;
+
+    console.log('Context received:', {
+        userId,
+        sessionId,
+        preferences,
+    });
+
+    // Use context data in your graph logic
+    const systemMessage = `You are a helpful assistant for user ${userId || 'anonymous'}.
+    User preferences: ${JSON.stringify(preferences || {})}`;
+
+    const agent = createReactAgent({
+        llm: new ChatOpenAI({
+            model: 'your-model',
+        }),
+        prompt: systemMessage,
+        tools: [], // Add your tools here
+    });
+
+    return agent.invoke(state);
+});
+
+export const graph = createEntrypointGraph({
+    stateSchema: State,
+    graph: workflow,
+});
+```
+
+### Hono.js Implementation
+
+In Hono.js, you can inject context using middleware:
+
+```ts
+// app.ts
+import { registerGraph } from '@langgraph-js/pure-graph';
+import { graph as contextAwareGraph } from './agent/context-aware-graph';
+import { Hono } from 'hono';
+import LangGraphApp, { type LangGraphServerContext } from '@langgraph-js/pure-graph/dist/adapter/hono/index';
+
+// Register your context-aware graph
+registerGraph('context-aware', contextAwareGraph);
+
+const app = new Hono<{ Variables: LangGraphServerContext }>();
+
+// Middleware to inject custom context
+app.use('/api/langgraph/*', async (c, next) => {
+    // You can get context from authentication, request data, etc.
+    const userId = c.req.header('x-user-id') || 'anonymous';
+    const sessionId = c.req.header('x-session-id') || 'session-123';
+
+    c.set('langgraph_context', {
+        userId,
+        sessionId,
+        preferences: { theme: 'dark', language: 'zh' },
+        metadata: { source: 'hono-app', timestamp: new Date().toISOString() },
+        // Add any custom fields your graph needs
+    });
+
+    await next();
+});
+
+app.route('/api', LangGraphApp);
+
+export default app;
+```
+
+### Next.js Implementation
+
+In Next.js, you can inject context using middleware:
+
+```ts
+// middleware.ts
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
+
+export function middleware(request: NextRequest) {
+    const requestHeaders = new Headers(request.headers);
+
+    // Add custom context to x-langgraph-context header
+    if (request.nextUrl.pathname.startsWith('/api/langgraph/')) {
+        // You can get context from cookies, headers, or other sources
+        const userId = request.cookies.get('user-id')?.value || 'anonymous';
+        const sessionId = request.cookies.get('session-id')?.value || 'session-123';
+
+        const langgraphContext = {
+            userId,
+            sessionId,
+            preferences: { theme: 'dark', language: 'zh' },
+            metadata: { source: 'nextjs-app', timestamp: new Date().toISOString() },
+            // Add any custom fields your graph needs
+        };
+
+        requestHeaders.set('x-langgraph-context', JSON.stringify(langgraphContext));
+    }
+
+    const response = NextResponse.next({
+        request: { headers: requestHeaders },
+    });
+
+    return response;
+}
+
+export const config = {
+    matcher: '/api/langgraph/:path*',
+};
+```
+
+```ts
+// app/api/langgraph/[...path]/route.ts
+import { GET, POST, DELETE } from '@langgraph-js/pure-graph/dist/adapter/nextjs/router';
+import { registerGraph } from '@langgraph-js/pure-graph';
+import { graph as contextAwareGraph } from '@/agent/context-aware-graph';
+
+// Register your context-aware graph
+registerGraph('context-aware', contextAwareGraph);
+
+export { GET, POST, DELETE };
+```
 
 ## Environment Configuration
 
