@@ -50,3 +50,4 @@ build
 .docker
 cache
 deno.lock
+.xyd

@@ -1,0 +1,74 @@
+{
+    "theme": {
+        "name": "opener",
+        "favicon": "/public/assets/logo.svg",
+        "banner": {
+            "content": "Pure Graph Docs",
+            "label": "Pure Graph Docs",
+            "icon": "sparkles"
+        }
+    },
+    "navigation": {
+        "tabs": [
+            {
+                "title": "Overview",
+                "page": "",
+                "href": "docs/index"
+            },
+            {
+                "title": "Architecture",
+                "page": "architecture",
+                "href": "docs/overview"
+            },
+            {
+                "title": "Frameworks",
+                "page": "frameworks",
+                "href": "docs/frameworks/nextjs"
+            },
+            {
+                "title": "API Reference",
+                "page": "api",
+                "href": "docs/api/index"
+            }
+        ],
+        "sidebar": [
+            {
+                "group": "Getting Started",
+                "pages": ["docs/index", "docs/overview"]
+            },
+            {
+                "group": "Framework Integration",
+                "pages": ["docs/frameworks/nextjs", "docs/frameworks/hono"]
+            },
+            {
+                "group": "Storage & Configuration",
+                "pages": [
+                    "docs/storage/index",
+                    "docs/storage/memory",
+                    "docs/storage/sqlite",
+                    "docs/storage/postgres",
+                    "docs/storage/redis"
+                ]
+            },
+            {
+                "group": "API Reference",
+                "pages": ["docs/api/index"]
+            },
+            {
+                "group": "Advanced Usage",
+                "pages": ["docs/advanced/index"]
+            },
+            {
+                "group": "Examples",
+                "pages": ["docs/examples/nextjs-chat"]
+            }
+        ]
+    },
+    "api": {},
+    "redirects": [
+        {
+            "source": "index",
+            "destination": "docs/index"
+        }
+    ]
+}

@@ -164,7 +164,6 @@ export async function POST(req: NextRequest) {
 
             // Extract custom context from request headers
             const langgraphContextHeader = req.headers.get('x-langgraph-context');
-            console.log(langgraphContextHeader);
             if (langgraphContextHeader) {
                 const langgraphContext = JSON.parse(decodeURIComponent(langgraphContextHeader));
                 payload.config = payload.config || {};
