@@ -13,6 +13,7 @@
     "scripts": {
         "dev": "bun run test/hono.ts",
         "build": " vite build && tsc",
+        "build:docs": "pnpm xyd build",
         "prepublish": "pnpm build"
     },
     "keywords": [
