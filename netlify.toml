@@ -1,0 +1,15 @@
+[build]
+command = "npx xyd-js build"
+publish = ".xyd/build/client"
+
+[[redirects]]
+from = "/"
+to = "/docs/index/"
+status = 301
+force = true
+
+[[redirects]]
+from = "/index.html"
+to = "/docs/index/"
+status = 301
+force = true

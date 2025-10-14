@@ -64,11 +64,13 @@
             }
         ]
     },
-    "api": {},
     "redirects": [
         {
             "source": "index",
             "destination": "docs/index"
         }
-    ]
+    ],
+    "seo": {
+        "domain": "https://pure-graph.netlify.app"
+    }
 }
