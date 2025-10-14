@@ -1,7 +1,7 @@
 {
     "theme": {
         "name": "opener",
-        "favicon": "/public/assets/logo.svg",
+        "favicon": "/logo.svg",
         "banner": {
             "content": "Pure Graph Docs",
             "label": "Pure Graph Docs",
@@ -11,17 +11,17 @@
     "navigation": {
         "tabs": [
             {
-                "title": "Overview",
-                "page": "",
-                "href": "docs/index"
+                "title": "Getting Started",
+                "page": "overview",
+                "href": "docs/getting-start"
             },
             {
-                "title": "Architecture",
-                "page": "architecture",
+                "title": "Core Concepts",
+                "page": "core-concepts",
                 "href": "docs/overview"
             },
             {
-                "title": "Frameworks",
+                "title": "Framework Integration",
                 "page": "frameworks",
                 "href": "docs/frameworks/nextjs"
             },
@@ -34,7 +34,7 @@
         "sidebar": [
             {
                 "group": "Getting Started",
-                "pages": ["docs/index", "docs/overview"]
+                "pages": ["docs/getting-start", "docs/overview"]
             },
             {
                 "group": "Framework Integration",
@@ -67,7 +67,7 @@
     "redirects": [
         {
             "source": "index",
-            "destination": "docs/index"
+            "destination": "docs/getting-start"
         }
     ],
     "seo": {

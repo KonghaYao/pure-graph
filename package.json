@@ -12,6 +12,7 @@
     "type": "module",
     "scripts": {
         "dev": "bun run test/hono.ts",
+        "dev:docs": "npx xyd-js",
         "build": " vite build && tsc",
         "build:docs": "npx xyd-js build",
         "prepublish": "pnpm build"
