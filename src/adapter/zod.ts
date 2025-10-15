@@ -36,7 +36,7 @@ export const MetadataSchema = z
 
 export const SendSchema = z.object({
     node: z.string(),
-    input: z.unknown().nullable(),
+    input: z.unknown().optional(),
 });
 
 export const CommandSchema = z.object({

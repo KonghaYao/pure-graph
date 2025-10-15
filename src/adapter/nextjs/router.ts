@@ -12,6 +12,7 @@ import {
     ThreadStateUpdate,
 } from '../zod';
 import { serialiseAsDict } from '../../graph/stream';
+import camelcaseKeys from 'camelcase-keys';
 
 // Next.js App Router 的 SSE 响应实现
 async function sseResponse(generator: AsyncGenerator<{ event: string; data: unknown }>): Promise<Response> {
@@ -105,10 +106,10 @@ export async function POST(req: NextRequest) {
         const payload = AssistantsSearchSchema.parse(body);
         const data = await client.assistants.search({
             graphId: payload.graph_id,
-            metadata: payload.metadata as any,
+            metadata: payload.metadata,
             limit: payload.limit,
             offset: payload.offset,
-        } as any);
+        });
         return NextResponse.json(data, {
             headers: { 'X-Pagination-Total': String(data.length) },
         });
@@ -118,25 +119,14 @@ export async function POST(req: NextRequest) {
     if (pathname.endsWith('/threads')) {
         const body = await req.json();
         const payload = ThreadCreatePayloadSchema.parse(body);
-        const thread = await client.threads.create({
-            threadId: payload.thread_id,
-            metadata: payload.metadata as any,
-            ifExists: (payload.if_exists as any) ?? undefined,
-        });
+        const thread = await client.threads.create(camelcaseKeys(payload));
         return NextResponse.json(thread);
     }
 
     if (pathname.endsWith('/threads/search')) {
         const body = await req.json();
         const payload = ThreadSearchPayloadSchema.parse(body);
-        const result = await client.threads.search({
-            metadata: payload.metadata as any,
-            status: payload.status as any,
-            limit: payload.limit,
-            offset: payload.offset,
-            sortBy: (payload.sort_by as any) ?? undefined,
-            sortOrder: (payload.sort_order as any) ?? undefined,
-        });
+        const result = await client.threads.search(camelcaseKeys(payload));
         return NextResponse.json(result, {
             headers: { 'X-Pagination-Total': String(result.length) },
         });
@@ -149,7 +139,7 @@ export async function POST(req: NextRequest) {
             const thread_id = match[1];
             const body = await req.json();
             const payload = ThreadStateUpdate.parse(body);
-            const result = await client.threads.updateState(thread_id, payload);
+            const result = await client.threads.updateState(thread_id, camelcaseKeys(payload));
             return NextResponse.json(result);
         }
     }
@@ -170,8 +160,11 @@ export async function POST(req: NextRequest) {
                 payload.config.configurable = payload.config.configurable || {};
                 Object.assign(payload.config.configurable, langgraphContext);
             }
-
-            const generator = client.runs.stream(thread_id, payload.assistant_id as string, payload as any);
+            const generator = client.runs.stream(
+                thread_id,
+                payload.assistant_id as string,
+                camelcaseKeys(payload) as any,
+            );
             return sseResponse(generator as any);
         }
     }
