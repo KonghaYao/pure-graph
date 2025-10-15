@@ -14,6 +14,7 @@ import {
 import { serialiseAsDict } from '../../graph/stream';
 import z from 'zod';
 import type { LangGraphServerContext } from './index';
+import camelcaseKeys from 'camelcase-keys';
 
 const api = new Hono<{ Variables: LangGraphServerContext }>();
 
@@ -36,7 +37,11 @@ api.post(
                 Object.assign(payload.config.configurable, langgraphContext);
             }
             /** @ts-ignore zod v3 的问题，与 ts 类型不一致 */
-            for await (const { event, data } of client.runs.stream(thread_id, payload.assistant_id, payload)) {
+            for await (const { event, data } of client.runs.stream(
+                thread_id,
+                payload.assistant_id,
+                camelcaseKeys(payload) as any,
+            )) {
                 await stream.writeSSE({ data: serialiseAsDict(data) ?? '', event });
             }
         });

@@ -121,7 +121,7 @@ export async function POST(req: NextRequest) {
         const thread = await client.threads.create({
             threadId: payload.thread_id,
             metadata: payload.metadata as any,
-            if_exists: (payload.if_exists as any) ?? undefined,
+            ifExists: (payload.if_exists as any) ?? undefined,
         });
         return NextResponse.json(thread);
     }

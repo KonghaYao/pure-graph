@@ -32,21 +32,20 @@ export type StreamInputData = {
     checkpointId?: string;
     checkpoint?: Omit<Checkpoint, 'thread_id'>;
     checkpoint_during?: boolean;
-    interrupt_before?: '*' | string[];
-    interrupt_after?: '*' | string[];
-    multitask_strategy?: MultitaskStrategy;
-    on_completion?: OnCompletionBehavior;
+    interruptBefore?: '*' | string[];
+    interruptAfter?: '*' | string[];
+    multitaskStrategy?: MultitaskStrategy;
+    onCompletion?: OnCompletionBehavior;
     signal?: AbortController['signal'];
     webhook?: string;
-    on_disconnect?: DisconnectMode;
-    after_seconds?: number;
-    if_not_exists?: 'create' | 'reject';
+    onDisconnect?: DisconnectMode;
+    afterSeconds?: number;
+    ifNotExists?: 'create' | 'reject';
     command?: Command;
     onRunCreated?: (params: { run_id: string; thread_id?: string }) => void;
-    stream_mode?: StreamMode[];
-    stream_subgraphs?: boolean;
-    stream_resumable?: boolean;
-    feedback_keys?: string[];
+    streamMode?: StreamMode[];
+    streamSubgraphs?: boolean;
+    streamResumable?: boolean;
     temporary?: boolean;
 };
 /**
@@ -68,7 +67,7 @@ export interface ILangGraphClient<TStateType = unknown> {
         create(payload?: {
             metadata?: Metadata;
             threadId?: string;
-            if_exists?: OnConflictBehavior;
+            ifExists?: OnConflictBehavior;
             graphId?: string;
             // supersteps?: Array<{
             //     updates: Array<{

@@ -2,16 +2,14 @@ import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { client } from './endpoint';
 import { ThreadIdParamSchema, ThreadCreatePayloadSchema, ThreadSearchPayloadSchema } from '../zod';
+import camelcaseKeys from 'camelcase-keys';
 
 const api = new Hono();
 
 // Threads Routes
 api.post('/threads', zValidator('json', ThreadCreatePayloadSchema), async (c) => {
     const payload = c.req.valid('json');
-    const thread = await client.threads.create({
-        ...payload,
-        threadId: payload.thread_id,
-    });
+    const thread = await client.threads.create(camelcaseKeys(payload));
 
     return c.json(thread);
 });

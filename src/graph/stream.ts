@@ -39,7 +39,7 @@ export async function streamStateWithQueue(
         checkpointer: payload.temporary ? null : undefined,
     });
 
-    const userStreamMode = payload.stream_mode ?? [];
+    const userStreamMode = payload.streamMode ?? [];
 
     const libStreamMode: Set<LangGraphStreamMode> = new Set([
         'values',
@@ -71,13 +71,13 @@ export async function streamStateWithQueue(
         {
             version: 'v2' as const,
 
-            interruptAfter: payload.interrupt_after,
-            interruptBefore: payload.interrupt_before,
+            interruptAfter: payload.interruptAfter,
+            interruptBefore: payload.interruptBefore,
 
             tags: payload.config?.tags,
             configurable: payload.config?.configurable,
             recursionLimit: payload.config?.recursionLimit,
-            subgraphs: payload.stream_subgraphs,
+            subgraphs: payload.streamSubgraphs,
             metadata,
 
             runId: run.run_id,
@@ -95,7 +95,7 @@ export async function streamStateWithQueue(
             if (event.tags?.includes('langsmith:hidden')) continue;
             if (event.event === 'on_chain_stream' && event.run_id === run.run_id) {
                 const [ns, mode, chunk] = (
-                    payload.stream_subgraphs ? event.data.chunk : [null, ...event.data.chunk]
+                    payload.streamSubgraphs ? event.data.chunk : [null, ...event.data.chunk]
                 ) as [string[] | null, LangGraphStreamMode, unknown];
 
                 // Listen for debug events and capture checkpoint
@@ -106,7 +106,7 @@ export async function streamStateWithQueue(
                         await queue.push(new EventMessage('messages', data));
                     }
                 } else if (userStreamMode.includes(mode)) {
-                    if (payload.stream_subgraphs && ns?.length) {
+                    if (payload.streamSubgraphs && ns?.length) {
                         await queue.push(new EventMessage(`${mode}|${ns.join('|')}`, data));
                     } else {
                         await queue.push(new EventMessage(mode, data));
