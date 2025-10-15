@@ -8,7 +8,10 @@ const api = new Hono();
 // Threads Routes
 api.post('/threads', zValidator('json', ThreadCreatePayloadSchema), async (c) => {
     const payload = c.req.valid('json');
-    const thread = await client.threads.create(payload);
+    const thread = await client.threads.create({
+        ...payload,
+        threadId: payload.thread_id,
+    });
 
     return c.json(thread);
 });
@@ -16,7 +19,7 @@ api.post('/threads', zValidator('json', ThreadCreatePayloadSchema), async (c) =>
 api.post('/threads/search', zValidator('json', ThreadSearchPayloadSchema), async (c) => {
     // Search Threads
     const payload = c.req.valid('json');
-    const result = await client.threads.search(payload as any);
+    const result = await client.threads.search({ ...payload, sortBy: payload.sort_by, sortOrder: payload.sort_order });
     c.res.headers.set('X-Pagination-Total', result.length.toString());
     return c.json(result);
 });

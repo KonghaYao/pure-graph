@@ -119,7 +119,7 @@ export async function POST(req: NextRequest) {
         const body = await req.json();
         const payload = ThreadCreatePayloadSchema.parse(body);
         const thread = await client.threads.create({
-            thread_id: payload.thread_id,
+            threadId: payload.thread_id,
             metadata: payload.metadata as any,
             if_exists: (payload.if_exists as any) ?? undefined,
         });

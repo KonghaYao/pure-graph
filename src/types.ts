@@ -67,9 +67,9 @@ export interface ILangGraphClient<TStateType = unknown> {
     threads: {
         create(payload?: {
             metadata?: Metadata;
-            thread_id?: string;
+            threadId?: string;
             if_exists?: OnConflictBehavior;
-            graph_id?: string;
+            graphId?: string;
             // supersteps?: Array<{
             //     updates: Array<{
             //         values: unknown;
