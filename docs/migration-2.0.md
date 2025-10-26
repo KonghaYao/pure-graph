@@ -1,3 +1,7 @@
+---
+title: 1.x to 2.0
+---
+
 # Migration Guide: Pure Graph 1.x to 2.0
 
 This guide helps you migrate your Pure Graph applications from version 1.x to 2.0, which introduces full support for LangGraph 1.0.
