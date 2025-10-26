@@ -1,17 +1,23 @@
-import { Annotation, entrypoint } from '@langchain/langgraph';
-import { createState } from '@langgraph-js/pro';
+import { Annotation, entrypoint, MessagesZodMeta } from '@langchain/langgraph';
 import { AgentProtocol } from './types';
-import { createReactAgent, createReactAgentAnnotation } from '@langchain/langgraph/prebuilt';
+import { BaseMessage, createAgent } from 'langchain';
 import { ChatOpenAI } from '@langchain/openai';
 import { BaseChatModel } from '@langchain/core/language_models/chat_models';
 import { createTools } from './tools';
 import { createEntrypointGraph } from '@langgraph-js/pure-graph';
-const AgentProtocolState = createState().build({
-    agent_protocol: Annotation<AgentProtocol>(),
-    model_name: Annotation<string>(),
+import { withLangGraph } from '@langchain/langgraph/zod';
+import { z } from 'zod/v3';
+
+const AgentProtocolSchema = z.object({
+    agent_protocol: z.custom<AgentProtocol>(),
+    model_name: z.string(),
 });
 
-const AgentGraphState = createState(AgentProtocolState, createReactAgentAnnotation()).build({});
+const AgentGraphState = z
+    .object({
+        messages: withLangGraph(z.custom<BaseMessage[]>(), MessagesZodMeta),
+    })
+    .merge(AgentProtocolSchema);
 
 export const createLLM = async (protocol: AgentProtocol, model_name?: string): Promise<BaseChatModel> => {
     if (!model_name) {
@@ -30,16 +36,15 @@ export const createLLM = async (protocol: AgentProtocol, model_name?: string): P
 
 export const graph = createEntrypointGraph({
     stateSchema: AgentGraphState,
-    graph: entrypoint({ name: 'agent-graph' }, async (state: typeof AgentGraphState.State) => {
+    graph: entrypoint({ name: 'agent-graph' }, async (state: z.infer<typeof AgentGraphState>) => {
         const protocol = state.agent_protocol;
 
         const tools = await createTools(protocol);
 
-        const agent = createReactAgent({
-            llm: await createLLM(protocol, state.model_name),
+        const agent = createAgent({
+            model: await createLLM(protocol, state.model_name),
             tools,
-            prompt: protocol.systemPrompt,
-            stateSchema: AgentGraphState,
+            systemPrompt: protocol.systemPrompt,
         });
         const response = await agent.invoke(state);
         return response;

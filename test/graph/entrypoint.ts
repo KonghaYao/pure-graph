@@ -1,19 +1,23 @@
-import { Annotation, entrypoint, getConfig, getCurrentTaskInput } from '@langchain/langgraph';
-import { createReactAgent, createReactAgentAnnotation } from '@langchain/langgraph/prebuilt';
+import { entrypoint, MessagesZodMeta, StateGraph } from '@langchain/langgraph';
 import { createState } from '@langgraph-js/pro';
+import { z } from 'zod/v3';
 import { createEntrypointGraph } from '../../src/';
 import { ChatOpenAI } from '@langchain/openai';
-const State = createState(createReactAgentAnnotation()).build({});
+import { BaseMessage, createAgent } from 'langchain';
+import { withLangGraph } from '@langchain/langgraph/zod';
+const State = z.object({
+    messages: withLangGraph(z.custom<BaseMessage[]>(), MessagesZodMeta),
+});
 
-const workflow = entrypoint('test-entrypoint', async (state: typeof State.State) => {
+const workflow = entrypoint('test-entrypoint', async (state: z.infer<typeof State>) => {
     // 这里可以获取 config
     // const config = getConfig();
     // console.log(config.configurable);
-    const agent = createReactAgent({
-        llm: new ChatOpenAI({
+    const agent = createAgent({
+        model: new ChatOpenAI({
             model: 'qwen-plus',
         }),
-        prompt: '你是一个智能助手',
+        systemPrompt: '你是一个智能助手',
         tools: [],
     });
     return agent.invoke(state);
@@ -22,4 +26,4 @@ const workflow = entrypoint('test-entrypoint', async (state: typeof State.State)
 export const graph = createEntrypointGraph({
     stateSchema: State,
     graph: workflow,
-});
+}).compile();

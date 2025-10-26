@@ -1,15 +1,5 @@
-import {
-    Command,
-    Config,
-    Metadata,
-    OnConflictBehavior,
-    Run,
-    RunStatus,
-    SortOrder,
-    Thread,
-    ThreadSortBy,
-    ThreadStatus,
-} from '@langgraph-js/sdk';
+import { Command, Config, Metadata, OnConflictBehavior, Run, Thread, ThreadStatus } from '@langgraph-js/sdk';
+import { RunStatus, SortOrder, ThreadSortBy } from '../types';
 
 export interface BaseThreadsManager<ValuesType = unknown> {
     setup(): Promise<void>;

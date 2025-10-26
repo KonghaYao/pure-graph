@@ -1,20 +1,10 @@
 import { BaseThreadsManager } from '../../threads/index.js';
-import {
-    Command,
-    Config,
-    Metadata,
-    OnConflictBehavior,
-    Run,
-    RunStatus,
-    SortOrder,
-    Thread,
-    ThreadSortBy,
-    ThreadStatus,
-} from '@langgraph-js/sdk';
+import { Command, Config, Metadata, OnConflictBehavior, Run, Thread, ThreadStatus } from '@langgraph-js/sdk';
 import type { SqliteSaver } from './checkpoint.js';
 import type { DatabaseType } from './type.js';
 import { getGraph } from '../../utils/getGraph.js';
 import { serialiseAsDict } from '../../graph/stream.js';
+import { RunStatus, SortOrder, ThreadSortBy } from '../../types';
 interface ThreadRow {
     thread_id: string;
     created_at: string;

@@ -1,22 +1,12 @@
 import { BaseThreadsManager } from '../../threads/index.js';
-import {
-    Command,
-    Config,
-    Metadata,
-    OnConflictBehavior,
-    Run,
-    RunStatus,
-    SortOrder,
-    Thread,
-    ThreadSortBy,
-    ThreadStatus,
-} from '@langgraph-js/sdk';
+import { Command, Config, Metadata, OnConflictBehavior, Run, Thread, ThreadStatus } from '@langgraph-js/sdk';
 import type { PostgresSaver } from '@langchain/langgraph-checkpoint-postgres';
 import type { Pool } from 'pg';
 
 // 这两个东西循环引用了
 import { getGraph } from '../../utils/getGraph.js';
 import { serialiseAsDict } from '../../graph/stream.js';
+import { RunStatus, SortOrder, ThreadSortBy } from '../../types';
 
 interface ThreadRow {
     thread_id: string;

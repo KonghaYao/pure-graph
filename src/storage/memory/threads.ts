@@ -1,18 +1,8 @@
 import { BaseThreadsManager } from '../../threads/index.js';
-import {
-    Command,
-    Config,
-    Metadata,
-    OnConflictBehavior,
-    Run,
-    RunStatus,
-    SortOrder,
-    Thread,
-    ThreadSortBy,
-    ThreadStatus,
-} from '@langgraph-js/sdk';
+import { Command, Config, Metadata, OnConflictBehavior, Run, Thread, ThreadStatus } from '@langgraph-js/sdk';
 import { getGraph } from '../../utils/getGraph.js';
 import { serialiseAsDict } from '../../graph/stream.js';
+import { RunStatus, SortOrder, ThreadSortBy } from '../../types';
 
 export class MemoryThreadsManager<ValuesType = unknown> implements BaseThreadsManager<ValuesType> {
     private threads: Thread<ValuesType>[] = [];

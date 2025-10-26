@@ -10,9 +10,9 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
-        "@langchain/mcp-adapters": "^0.6.0",
-        "@langchain/openai": "^0.6.14",
-        "@langchain/tavily": "^0.1.5",
+        "@langchain/mcp-adapters": "^1.0.0",
+        "@langchain/openai": "^1.0.0",
+        "@langchain/tavily": "^1.0.0",
         "@langgraph-js/pure-graph": "workspace:^*"
     }
 }
