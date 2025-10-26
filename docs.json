@@ -61,6 +61,10 @@
             {
                 "group": "Examples",
                 "pages": ["docs/examples/nextjs-chat"]
+            },
+            {
+                "group": "Migration Guide",
+                "pages": ["docs/migration-2.0"]
             }
         ]
     },

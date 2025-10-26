@@ -1,8 +1,19 @@
 # Pure Graph
 
-Pure Graph is a library that provides a standard LangGraph endpoint for integrating into various frameworks like NextJS and Hono.js. It supports multiple storage backends (SQLite, PostgreSQL, Redis) and message queues. This document will guide you on how to use Pure Graph in your projects.
+Pure Graph is a library that provides a standard LangGraph endpoint for integrating into various frameworks like NextJS and Hono.js. It supports multiple storage backends (SQLite, PostgreSQL, Redis) and message queues.
+
+## 📢 Version Compatibility
+
+-   **Pure Graph 2.0+**: Supports LangGraph 1.0+
+-   **Pure Graph 1.x**: Compatible with LangGraph 0.1+
+
+### Migration Guide
+
+For detailed migration instructions from Pure Graph 1.x to 2.0, see our [Migration Guide](https://pure-graph.netlify.app/docs/migration-2.0).
 
 📚 **[Complete Documentation](https://pure-graph.netlify.app/docs/index.md)** - Comprehensive guides, API reference, and examples
+
+This document will guide you on how to use Pure Graph in your projects.
 
 ## Features
 
