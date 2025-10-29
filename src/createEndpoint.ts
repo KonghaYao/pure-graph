@@ -61,10 +61,14 @@ export const createEndpoint = (): ILangGraphClient => {
     (async function init() {
         await LangGraphGlobal.initGlobal();
     })();
-    const threads = LangGraphGlobal.globalThreadsManager;
+    const getThreads = () => {
+        return LangGraphGlobal.globalThreadsManager;
+    };
     return {
         assistants: AssistantEndpoint,
-        threads,
+        get threads() {
+            return LangGraphGlobal.globalThreadsManager;
+        },
         runs: {
             list(
                 threadId: string,
@@ -74,7 +78,7 @@ export const createEndpoint = (): ILangGraphClient => {
                     status?: RunStatus;
                 },
             ): Promise<Run[]> {
-                return threads.listRuns(threadId, options);
+                return getThreads().listRuns(threadId, options);
             },
             async cancel(threadId: string, runId: string, wait?: boolean, action?: CancelAction): Promise<void> {
                 return LangGraphGlobal.globalMessageQueue.cancelQueue(runId);
@@ -88,7 +92,7 @@ export const createEndpoint = (): ILangGraphClient => {
                         thread_id: threadId,
                     },
                 };
-
+                const threads = getThreads();
                 for await (const data of streamState(
                     threads,
                     threads.createRun(threadId, assistantId, payload),

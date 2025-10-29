@@ -11,7 +11,7 @@
     ],
     "type": "module",
     "scripts": {
-        "dev": "bun run test/hono.ts",
+        "dev": "bun run --port 8123 test/hono.ts",
         "dev:docs": "npx xyd-js",
         "build": " vite build && tsc",
         "build:docs": "npx xyd-js build",
