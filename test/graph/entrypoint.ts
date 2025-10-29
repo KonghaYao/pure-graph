@@ -27,4 +27,4 @@ const workflow = entrypoint('test-entrypoint', async (state: z.infer<typeof Stat
 export const graph = createEntrypointGraph({
     stateSchema: State,
     graph: workflow,
-}).compile();
+});

@@ -1,6 +1,6 @@
 {
     "name": "@langgraph-js/pure-graph",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "description": "A library that provides a standard LangGraph endpoint for integrating into various frameworks like Next.js and Hono.js, with support for multiple storage backends (SQLite, PostgreSQL, Redis) and message queues.",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -73,6 +73,6 @@
         "@types/pg": "^8.15.5",
         "rollup-plugin-node-externals": "^8.1.1",
         "typescript": "^5.9.2",
-        "vite": "^6.0.0"
+        "vite": "^7.1.12"
     }
 }
