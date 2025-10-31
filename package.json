@@ -1,6 +1,6 @@
 {
     "name": "@langgraph-js/pure-graph",
-    "version": "2.1.1",
+    "version": "2.1.2",
     "description": "A library that provides a standard LangGraph endpoint for integrating into various frameworks like Next.js and Hono.js, with support for multiple storage backends (SQLite, PostgreSQL, Redis) and message queues.",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -50,7 +50,7 @@
         "@langchain/langgraph": "^1.0.0",
         "@langchain/langgraph-checkpoint": "^1.0.0",
         "@langchain/langgraph-checkpoint-sqlite": "^1.0.0",
-        "@langgraph-js/pro": "^1.8.1",
+        "@langgraph-js/pro": "^2.0.0",
         "better-sqlite3": "^12.4.1",
         "camelcase-keys": "^10.0.0",
         "eventemitter3": "^5.0.1",
