@@ -56,11 +56,7 @@ export const AssistantEndpoint: ILangGraphClient['assistants'] = {
     },
 };
 
-export const createEndpoint = (): ILangGraphClient => {
-    // 进行初始化，保证数据的可靠性
-    (async function init() {
-        await LangGraphGlobal.initGlobal();
-    })();
+export const createEndpoint = () => {
     const getThreads = () => {
         return LangGraphGlobal.globalThreadsManager;
     };

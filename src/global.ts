@@ -9,24 +9,26 @@ export class LangGraphGlobal {
     static globalMessageQueue: StreamQueueManager<BaseStreamQueueInterface> = null as any;
     static globalCheckPointer: BaseCheckpointSaver = null as any;
     static globalThreadsManager: BaseThreadsManager = null as any;
-    static isInitialized = false;
+    static isInitialized: Promise<void> | null = null;
     static async initGlobal() {
         if (LangGraphGlobal.isInitialized) {
-            return;
+            return LangGraphGlobal.isInitialized;
         }
-        const [globalMessageQueue, globalCheckPointer] = await Promise.all([
-            createMessageQueue(),
-            createCheckPointer(),
-        ]);
-        console.debug('LG | checkpointer created');
-        const globalThreadsManager = await createThreadManager({
-            checkpointer: globalCheckPointer as SqliteSaver | PostgresSaver,
-        });
-        console.debug('LG | threads manager created');
-        console.debug('LG | global init done');
-        LangGraphGlobal.globalMessageQueue = globalMessageQueue;
-        LangGraphGlobal.globalCheckPointer = globalCheckPointer;
-        LangGraphGlobal.globalThreadsManager = globalThreadsManager;
-        LangGraphGlobal.isInitialized = true;
+        LangGraphGlobal.isInitialized = (async () => {
+            const [globalMessageQueue, globalCheckPointer] = await Promise.all([
+                createMessageQueue(),
+                createCheckPointer(),
+            ]);
+            console.debug('LG | checkpointer created');
+            const globalThreadsManager = await createThreadManager({
+                checkpointer: globalCheckPointer as SqliteSaver | PostgresSaver,
+            });
+            console.debug('LG | threads manager created');
+            console.debug('LG | global init done');
+            LangGraphGlobal.globalMessageQueue = globalMessageQueue;
+            LangGraphGlobal.globalCheckPointer = globalCheckPointer;
+            LangGraphGlobal.globalThreadsManager = globalThreadsManager;
+        })();
+        return LangGraphGlobal.isInitialized;
     }
 }

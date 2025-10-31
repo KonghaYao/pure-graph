@@ -1,5 +1,6 @@
 /** @ts-ignore */
 import type { NextRequest } from 'next/server';
+import { LangGraphGlobal } from '../../global';
 declare global {
     var LG_INIT_PROMISE:
         | Promise<{
@@ -25,6 +26,7 @@ declare global {
 export async function ensureInitialized(attachGraphPromise: () => Promise<void>) {
     if (globalThis.LG_INIT_PROMISE === undefined) {
         globalThis.LG_INIT_PROMISE = (async () => {
+            await LangGraphGlobal.initGlobal();
             await attachGraphPromise();
             const { GET, POST, DELETE } = await import('./router');
             return {
