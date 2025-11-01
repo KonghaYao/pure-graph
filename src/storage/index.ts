@@ -1,14 +1,12 @@
 import { BaseStreamQueueInterface, StreamQueueManager } from '../queue/stream_queue';
+import { KyselyThreadsManager } from './kysely/threads';
 import { MemorySaver } from './memory/checkpoint';
 import { MemoryStreamQueue } from './memory/queue';
 import { MemoryThreadsManager } from './memory/threads';
 import type { SqliteSaver as SqliteSaverType } from './sqlite/checkpoint';
 import type { PostgresSaver } from '@langchain/langgraph-checkpoint-postgres';
-import { SQLiteThreadsManager } from './sqlite/threads';
-import { PostgresThreadsManager } from './pg/threads';
 
 // 所有的适配实现，都请写到这里，通过环境变量进行判断使用哪种方式进行适配
-
 export const createCheckPointer = async () => {
     if (
         (process.env.REDIS_URL && process.env.CHECKPOINT_TYPE === 'redis') ||
@@ -58,15 +56,21 @@ export const createMessageQueue = async () => {
 
 export const createThreadManager = async (config: { checkpointer?: SqliteSaverType | PostgresSaver }) => {
     if (process.env.DATABASE_URL && config.checkpointer) {
-        // 这里直接引入避免循环引用问题
-        const threadsManager = new PostgresThreadsManager(config.checkpointer as PostgresSaver);
+        console.debug('LG | Using PostgreSQL ThreadsManager');
+        const { PostgresAdapter } = await import('./kysely/pg-adapter');
+        const pool = (config.checkpointer as PostgresSaver as any).pool;
+        const threadsManager = new KyselyThreadsManager(new PostgresAdapter(pool));
         if (process.env.DATABASE_INIT === 'true') {
             await threadsManager.setup();
         }
         return threadsManager;
     }
     if (process.env.SQLITE_DATABASE_URI && config.checkpointer) {
-        const threadsManager = new SQLiteThreadsManager(config.checkpointer as SqliteSaverType);
+        console.debug('LG | Using SQLite ThreadsManager');
+        const { SQLiteAdapter } = await import('./kysely/sqlite-adapter');
+        const database = (config.checkpointer as SqliteSaverType).db;
+        const threadsManager = new KyselyThreadsManager(new SQLiteAdapter(database));
+        // sqlite 可以执行多次，速度很快
         await threadsManager.setup();
         return threadsManager;
     }

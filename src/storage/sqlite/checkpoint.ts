@@ -1,5 +1,6 @@
 import { DatabaseType } from './type.js';
-import { Database } from './DB.js';
+/** @ts-ignore */
+import { Database } from 'better-sqlite3';
 import type { RunnableConfig } from '@langchain/core/runnables';
 import {
     BaseCheckpointSaver,

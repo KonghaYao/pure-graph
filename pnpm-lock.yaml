@@ -32,6 +32,9 @@ importers:
       eventemitter3:
         specifier: ^5.0.1
         version: 5.0.1
+      kysely:
+        specifier: ^0.28.8
+        version: 0.28.8
       langchain:
         specifier: ^1.0.1
         version: 1.0.1(@langchain/core@1.0.1(openai@6.7.0(zod@3.25.76)))(openai@6.7.0(zod@3.25.76))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(zod-to-json-schema@3.24.6(zod@3.25.76))
@@ -1634,6 +1637,10 @@ packages:
   jsonrepair@3.13.1:
     resolution: {integrity: sha512-WJeiE0jGfxYmtLwBTEk8+y/mYcaleyLXWaqp5bJu0/ZTSeG0KQq/wWQ8pmnkKenEdN6pdnn6QtcoSUkbqDHWNw==}
     hasBin: true
+
+  kysely@0.28.8:
+    resolution: {integrity: sha512-QUOgl5ZrS9IRuhq5FvOKFSsD/3+IA6MLE81/bOOTRA/YQpKDza2sFdN5g6JCB9BOpqMJDGefLCQ9F12hRS13TA==}
+    engines: {node: '>=20.0.0'}
 
   langchain@1.0.1:
     resolution: {integrity: sha512-IT4JBVbKBh2AjaUFT9OsmOfeK3UbKy3SgdzZOuvet25sAaMpAR8IaM9XVddRs+OXQqVg6sOS01KUUVCJksVhHg==}
@@ -3950,6 +3957,8 @@ snapshots:
   json-schema-traverse@0.4.1: {}
 
   jsonrepair@3.13.1: {}
+
+  kysely@0.28.8: {}
 
   langchain@1.0.1(@langchain/core@1.0.1(openai@6.7.0(zod@3.25.76)))(openai@6.7.0(zod@3.25.76))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(zod-to-json-schema@3.24.6(zod@3.25.76)):
     dependencies:
