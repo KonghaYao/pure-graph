@@ -126,12 +126,13 @@ To integrate Pure Graph into a Hono.js project, follow these steps:
     import { graph } from './agent/graph-name/graph';
     import { Hono } from 'hono';
     import LangGraphApp, { type LangGraphServerContext } from '@langgraph-js/pure-graph/dist/adapter/hono/index';
-
+    import { cors } from 'hono/cors';
     registerGraph('test', graph);
 
     const app = new Hono<{ Variables: LangGraphServerContext }>();
-
+    app.use(cors())
     app.route('/', LangGraphApp);
+
 
     export default app;
     ```

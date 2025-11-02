@@ -24,9 +24,13 @@ export class RedisStreamQueue extends BaseStreamQueue implements BaseStreamQueue
         this.subscriberRedis = RedisStreamQueue.subscriberRedis;
         this.cancelSignal = new AbortController();
 
-        // 连接 Redis 客户端
-        this.redis.connect();
-        this.subscriberRedis.connect();
+        // 连接 Redis 客户端（检查是否已经连接）
+        if (!this.redis.isOpen) {
+            this.redis.connect();
+        }
+        if (!this.subscriberRedis.isOpen) {
+            this.subscriberRedis.connect();
+        }
         this.isConnected = true;
     }
 
