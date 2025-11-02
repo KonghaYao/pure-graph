@@ -1,7 +1,6 @@
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
-
-import { streamSSE } from 'hono/streaming';
+import { SSEStreamingApi, streamSSE } from 'hono/streaming';
 import { client } from './endpoint';
 import {
     ThreadIdParamSchema,
@@ -16,6 +15,71 @@ import z from 'zod';
 import type { LangGraphServerContext } from './index';
 import camelcaseKeys from 'camelcase-keys';
 
+/**
+ * 为 streamSSE 添加心跳功能的 wrapper 函数
+ * @param streamFn 原始的 async stream 函数
+ * @param heartbeatInterval 心跳间隔，默认 3 秒
+ * @returns 包裹后的 async stream 函数
+ */
+function withHeartbeat(
+    streamFn: (stream: SSEStreamingApi) => Promise<void>,
+    heartbeatInterval: number = 3000,
+): (stream: SSEStreamingApi) => Promise<void> {
+    return async (stream: SSEStreamingApi) => {
+        let heartbeatTimer: NodeJS.Timeout | null = null;
+
+        // 启动心跳定时器的函数
+        const startHeartbeat = () => {
+            if (heartbeatTimer) {
+                clearInterval(heartbeatTimer);
+            }
+            heartbeatTimer = setInterval(async () => {
+                try {
+                    await stream.writeSSE({ event: 'ping', data: '' });
+                } catch (error) {
+                    if (heartbeatTimer) {
+                        clearInterval(heartbeatTimer);
+                        heartbeatTimer = null;
+                    }
+                }
+            }, heartbeatInterval);
+        };
+
+        // 停止心跳定时器的函数
+        const stopHeartbeat = () => {
+            if (heartbeatTimer) {
+                clearInterval(heartbeatTimer);
+                heartbeatTimer = null;
+            }
+        };
+
+        // 创建代理 stream 对象，在每次写入时重置心跳
+        const proxiedStream = new Proxy(stream, {
+            get(target, prop) {
+                if (prop === 'writeSSE') {
+                    return async (...args: any[]) => {
+                        // 每次有数据写入时，先停止当前心跳，然后重新启动
+                        stopHeartbeat();
+                        const result = await (target as any)[prop](...args);
+                        startHeartbeat();
+                        return result;
+                    };
+                }
+                return (target as any)[prop];
+            },
+        });
+
+        // 启动初始心跳
+        startHeartbeat();
+
+        try {
+            await streamFn(proxiedStream);
+        } finally {
+            stopHeartbeat();
+        }
+    };
+}
+
 const api = new Hono<{ Variables: LangGraphServerContext }>();
 
 // 最常用的对话接口
@@ -29,22 +93,25 @@ api.post(
         const payload = c.req.valid('json');
 
         // c.header('Content-Location', `/threads/${thread_id}/runs/${run.run_id}`);
-        return streamSSE(c, async (stream) => {
-            payload.config = payload.config || {};
-            payload.config.configurable = payload.config.configurable || {};
-            const langgraphContext = c.get('langgraph_context');
-            if (langgraphContext) {
-                Object.assign(payload.config.configurable, langgraphContext);
-            }
-            /** @ts-ignore zod v3 的问题，与 ts 类型不一致 */
-            for await (const { event, data } of client.runs.stream(
-                thread_id,
-                payload.assistant_id,
-                camelcaseKeys(payload) as any,
-            )) {
-                await stream.writeSSE({ data: serialiseAsDict(data) ?? '', event });
-            }
-        });
+        return streamSSE(
+            c,
+            withHeartbeat(async (stream) => {
+                payload.config = payload.config || {};
+                payload.config.configurable = payload.config.configurable || {};
+                const langgraphContext = c.get('langgraph_context');
+                if (langgraphContext) {
+                    Object.assign(payload.config.configurable, langgraphContext);
+                }
+                /** @ts-ignore zod v3 的问题，与 ts 类型不一致 */
+                for await (const { event, data } of client.runs.stream(
+                    thread_id,
+                    payload.assistant_id,
+                    camelcaseKeys(payload) as any,
+                )) {
+                    await stream.writeSSE({ data: serialiseAsDict(data) ?? '', event });
+                }
+            }),
+        );
     },
 );
 
