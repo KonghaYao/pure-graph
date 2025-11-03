@@ -35,7 +35,7 @@ function withHeartbeat(
             }
             heartbeatTimer = setInterval(async () => {
                 try {
-                    await stream.writeSSE({ event: 'ping', data: '' });
+                    await stream.writeSSE({ event: 'ping', data: '{}' });
                 } catch (error) {
                     if (heartbeatTimer) {
                         clearInterval(heartbeatTimer);
