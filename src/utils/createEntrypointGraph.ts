@@ -2,6 +2,7 @@ import { InteropZodObject } from '@langchain/core/utils/types';
 import {
     AnnotationRoot,
     CompiledStateGraph,
+    MemorySaver,
     Pregel,
     StateDefinition,
     StateGraph,
