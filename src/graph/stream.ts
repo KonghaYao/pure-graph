@@ -1,4 +1,4 @@
-import { BaseMessageChunk, isBaseMessage } from '@langchain/core/messages';
+import { BaseMessageChunk } from '@langchain/core/messages';
 import type { BaseCheckpointSaver, LangGraphRunnableConfig } from '@langchain/langgraph';
 import type { Pregel } from '@langchain/langgraph/pregel';
 import { getLangGraphCommand } from '../utils/getLangGraphCommand.js';
@@ -66,11 +66,9 @@ export async function streamStateWithQueue(
         ...payload.config?.metadata,
         run_attempt: options.attempt,
     };
-    const events = graph.streamEvents(
+    const events = graph.stream(
         payload.command != null ? getLangGraphCommand(payload.command) : payload.input ?? null,
         {
-            version: 'v2' as const,
-
             interruptAfter: payload.interruptAfter,
             interruptBefore: payload.interruptBefore,
 
@@ -86,89 +84,43 @@ export async function streamStateWithQueue(
         },
     );
 
-    const messages: Record<string, BaseMessageChunk> = {};
-    const completedIds = new Set<string>();
-
     try {
-        for await (const event of events) {
-            // console.log(event);
-            if (event.tags?.includes('langsmith:hidden')) continue;
-            if (event.event === 'on_chain_stream' && event.run_id === run.run_id) {
-                const [ns, mode, chunk] = (
-                    payload.streamSubgraphs ? event.data.chunk : [null, ...event.data.chunk]
-                ) as [string[] | null, LangGraphStreamMode, unknown];
-
-                // Listen for debug events and capture checkpoint
-                let data: unknown = chunk;
-
-                if (mode === 'messages') {
-                    if (userStreamMode.includes('messages-tuple')) {
-                        await queue.push(new EventMessage('messages', data));
-                    }
-                } else if (userStreamMode.includes(mode)) {
-                    if (payload.streamSubgraphs && ns?.length) {
-                        await queue.push(new EventMessage(`${mode}|${ns.join('|')}`, data));
-                    } else {
-                        await queue.push(new EventMessage(mode, data));
-                    }
-                }
-                if (mode === 'values') {
-                    await threads.set(run.thread_id, {
-                        values: data ? JSON.parse(serialiseAsDict(data)) : '',
-                    });
-                }
-            } else if (userStreamMode.includes('events')) {
-                await queue.push(new EventMessage('events', event));
+        const sendedMetadataMessage = new Set();
+        for await (const event of await events) {
+            let ns: string[] = [];
+            /** @ts-ignore subgraph 类型可以为 [ns,name,value] */
+            if (event.length === 3) {
+                ns = event.splice(0, 1);
             }
 
-            // TODO: we still rely on old messages mode based of streamMode=values
-            // In order to fully switch to library messages mode, we need to do ensure that
-            // `StreamMessagesHandler` sends the final message, which requires the following:
-            // - handleLLMEnd does not send the final message b/c handleLLMNewToken sets the this.emittedChatModelRunIds[runId] flag. Python does not do that
-            // - handleLLMEnd receives the final message as BaseMessageChunk rather than BaseMessage, which from the outside will become indistinguishable.
-            // - handleLLMEnd should not dedupe the message
-            // - Don't think there's an utility that would convert a BaseMessageChunk to a BaseMessage?
-            if (userStreamMode.includes('messages')) {
-                if (event.event === 'on_chain_stream' && event.run_id === run.run_id) {
-                    const newMessages: Array<BaseMessageChunk> = [];
-                    const [_, chunk]: [string, any] = event.data.chunk;
-
-                    let chunkMessages: Array<BaseMessageChunk> = [];
-                    if (typeof chunk === 'object' && chunk != null && 'messages' in chunk && !isBaseMessage(chunk)) {
-                        chunkMessages = chunk?.messages;
-                    }
-
-                    if (!Array.isArray(chunkMessages)) {
-                        chunkMessages = [chunkMessages];
-                    }
-
-                    for (const message of chunkMessages) {
-                        if (!message.id || completedIds.has(message.id)) continue;
-                        completedIds.add(message.id);
-                        newMessages.push(message);
-                    }
-
-                    if (newMessages.length > 0) {
-                        await queue.push(new EventMessage('messages/complete', newMessages));
-                    }
-                } else if (event.event === 'on_chat_model_stream' && !event.tags?.includes('nostream')) {
-                    const message: BaseMessageChunk = event.data.chunk;
-
-                    if (!message.id) continue;
-
-                    if (messages[message.id] == null) {
-                        messages[message.id] = message;
-                        await queue.push(
-                            new EventMessage('messages/metadata', {
-                                [message.id]: { metadata: event.metadata },
-                            }),
-                        );
-                    } else {
-                        messages[message.id] = messages[message.id].concat(message);
-                    }
-
-                    await queue.push(new EventMessage('messages/partial', [messages[message.id]]));
+            const getNameWithNs = (name: string) => {
+                if (ns.length === 0) return name;
+                if (ns.length === 1 && ns[0]?.length === 0) return name;
+                return `${name}|${ns.join('|')}`;
+            };
+            if (event[0] === 'values') {
+                const value = event[1];
+                await queue.push(new EventMessage(getNameWithNs('values'), value));
+                if (getNameWithNs('values') === 'values')
+                    await threads.set(run.thread_id, {
+                        values: value ? JSON.parse(serialiseAsDict(value)) : '',
+                    });
+            } else if (event[0] === 'messages') {
+                const message = event[1][0];
+                const metadata = event[1][1];
+                // 只在第一次发送 metadata
+                if (message.id && !sendedMetadataMessage.has(message.id)) {
+                    await queue.push(
+                        new EventMessage('messages/metadata', {
+                            [message.id]: metadata,
+                        }),
+                    );
+                    sendedMetadataMessage.add(message.id);
                 }
+                await queue.push(new EventMessage('messages/partial', [message]));
+            } else if (event[0] === 'updates') {
+                const updates = event[1];
+                await queue.push(new EventMessage(getNameWithNs('updates'), updates));
             }
         }
     } finally {
