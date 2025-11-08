@@ -5,6 +5,7 @@ import { ChatOpenAI } from '@langchain/openai';
 import { BaseMessage, createAgent, tool } from 'langchain';
 import { withLangGraph } from '@langchain/langgraph/zod';
 import { LangGraphClient } from '@langgraph-js/sdk';
+import { create_artifacts } from './create_artifacts';
 
 const State = z.object({
     messages: withLangGraph(z.custom<BaseMessage[]>(), MessagesZodMeta),
@@ -32,7 +33,7 @@ const workflow = entrypoint('test-entrypoint', async (state: z.infer<typeof Stat
             model: 'qwen-plus',
         }),
         systemPrompt: '你是一个智能助手',
-        tools: [show_form],
+        tools: [show_form, create_artifacts],
         checkpointer: LangGraphGlobal.globalCheckPointer,
     });
     return agent.invoke(state);

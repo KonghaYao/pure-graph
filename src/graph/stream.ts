@@ -1,9 +1,9 @@
-import { BaseMessageChunk } from '@langchain/core/messages';
+import { AIMessageChunk } from '@langchain/core/messages';
 import type { BaseCheckpointSaver, LangGraphRunnableConfig } from '@langchain/langgraph';
 import type { Pregel } from '@langchain/langgraph/pregel';
 import { getLangGraphCommand } from '../utils/getLangGraphCommand.js';
 import type { BaseStreamQueueInterface } from '../queue/stream_queue.js';
-
+import { concat } from '@langchain/core/utils/stream';
 import { LangGraphGlobal } from '../global.js';
 import { Run } from '@langgraph-js/sdk';
 import { EventMessage, StreamErrorEventMessage, StreamEndEventMessage } from '../queue/event_message.js';
@@ -86,6 +86,7 @@ export async function streamStateWithQueue(
 
     try {
         const sendedMetadataMessage = new Set();
+        const messageChunks = new Map<string, AIMessageChunk[]>();
         for await (const event of await events) {
             let ns: string[] = [];
             /** @ts-ignore subgraph 类型可以为 [ns,name,value] */
@@ -117,7 +118,17 @@ export async function streamStateWithQueue(
                     );
                     sendedMetadataMessage.add(message.id);
                 }
-                await queue.push(new EventMessage('messages/partial', [message]));
+                if (AIMessageChunk.isInstance(message) && message.id) {
+                    messageChunks.set(message.id, [
+                        ...(messageChunks.get(message.id) ?? []),
+                        message as AIMessageChunk,
+                    ]);
+                    await queue.push(
+                        new EventMessage('messages/partial', [messageChunks.get(message.id)!.reduce(concat)]),
+                    );
+                } else {
+                    await queue.push(new EventMessage('messages/partial', [message]));
+                }
             } else if (event[0] === 'updates') {
                 const updates = event[1];
                 await queue.push(new EventMessage(getNameWithNs('updates'), updates));
