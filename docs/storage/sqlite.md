@@ -8,7 +8,7 @@ SQLite provides file-based persistence with ACID compliance, making it perfect f
 
 ## Overview
 
-SQLite is a self-contained, file-based database that doesn't require a separate server process. Pure Graph uses SQLite as the default persistent storage when no other databases are configured.
+SQLite is a self-contained, file-based database that doesn't require a separate server process. Open LangGraph Server uses SQLite as the default persistent storage when no other databases are configured.
 
 ## Characteristics
 
@@ -47,7 +47,7 @@ touch ./.langgraph_api/chat.db
 
 ## Schema
 
-Pure Graph automatically creates the following tables:
+Open LangGraph Server automatically creates the following tables:
 
 -   `checkpoints` - Graph state persistence
 -   `checkpoint_writes` - Checkpoint write operations

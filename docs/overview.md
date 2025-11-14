@@ -4,13 +4,13 @@ title: Overview
 
 # Architecture Overview
 
-Pure Graph is built with a modular architecture that separates concerns into distinct layers, allowing for maximum flexibility and extensibility. This document provides an in-depth look at the core components and how they interact.
+Open LangGraph Server is built with a modular architecture that separates concerns into distinct layers, allowing for maximum flexibility and extensibility. This document provides an in-depth look at the core components and how they interact.
 
 ## Core Architecture
 
 ```
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   Framework     │    │    Pure Graph    │    │   LangGraph     │
+│   Framework     │    │    Open LangGraph Server    │    │   LangGraph     │
 │   Adapters      │◄──►│    API Layer     │◄──►│   Workflows     │
 │                 │    │                  │    │                 │
 │ • Next.js       │    │ • REST Endpoints │    │ • StateGraphs   │
@@ -37,7 +37,7 @@ Pure Graph is built with a modular architecture that separates concerns into dis
 
 Framework adapters provide the HTTP interface and handle request/response lifecycle. They are responsible for:
 
--   **Request Routing**: Mapping HTTP requests to Pure Graph operations
+-   **Request Routing**: Mapping HTTP requests to Open LangGraph Server operations
 -   **Context Injection**: Passing framework-specific context to graph executions
 -   **Response Formatting**: Converting LangGraph outputs to appropriate HTTP responses
 -   **Middleware Support**: Integrating with framework authentication and middleware systems
@@ -104,7 +104,7 @@ The API layer implements the LangGraph SDK-compatible REST endpoints:
 
 ### Storage Layer
 
-Pure Graph supports multiple storage backends with automatic failover and configuration-based selection:
+Open LangGraph Server supports multiple storage backends with automatic failover and configuration-based selection:
 
 #### Checkpoint Storage
 
@@ -154,7 +154,7 @@ The thread manager coordinates the entire conversation lifecycle:
 
 ## Configuration System
 
-Pure Graph uses environment variables for configuration with sensible defaults:
+Open LangGraph Server uses environment variables for configuration with sensible defaults:
 
 ### Environment Variables
 
@@ -181,7 +181,7 @@ const globalThreadsManager = await createThreadManager({
 
 ## Type System
 
-Pure Graph leverages TypeScript and Zod for comprehensive type safety:
+Open LangGraph Server leverages TypeScript and Zod for comprehensive type safety:
 
 -   **Compile-time Safety**: Full TypeScript definitions for all APIs
 -   **Runtime Validation**: Zod schemas validate all input/output data

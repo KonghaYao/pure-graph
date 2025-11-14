@@ -3,9 +3,12 @@
         "name": "opener",
         "favicon": "/logo.svg",
         "banner": {
-            "content": "Pure Graph Docs",
-            "label": "Pure Graph Docs",
+            "content": "Open LangGraph Server Docs",
+            "label": "Open LangGraph Server Docs",
             "icon": "sparkles"
+        },
+        "fonts": {
+            "family": "system-ui"
         }
     },
     "navigation": {

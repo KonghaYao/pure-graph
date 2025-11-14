@@ -8,7 +8,7 @@ PostgreSQL offers enterprise-grade reliability, concurrent access, and scalabili
 
 ## Overview
 
-PostgreSQL is a powerful, open-source object-relational database system known for its robustness, extensibility, and standards compliance. Pure Graph uses PostgreSQL for enterprise-grade data persistence.
+PostgreSQL is a powerful, open-source object-relational database system known for its robustness, extensibility, and standards compliance. Open LangGraph Server uses PostgreSQL for enterprise-grade data persistence.
 
 ## Characteristics
 
@@ -35,7 +35,7 @@ DATABASE_SSL=true
 
 ### Prerequisites
 
-You need to have a PostgreSQL database ready. Pure Graph will automatically create the required tables when you first run your application.
+You need to have a PostgreSQL database ready. Open LangGraph Server will automatically create the required tables when you first run your application.
 
 ### Configuration
 
@@ -49,7 +49,7 @@ DATABASE_INIT=true
 
 ### Initialize Schema
 
-Pure Graph automatically creates the required tables on first run:
+Open LangGraph Server automatically creates the required tables on first run:
 
 ```bash
 # Set DATABASE_INIT=true for initial setup
@@ -110,7 +110,7 @@ CREATE TABLE checkpoint_writes (
 
 ## Connection Pooling
 
-Pure Graph automatically handles connection pooling. You can customize it:
+Open LangGraph Server automatically handles connection pooling. You can customize it:
 
 ```typescript
 // Custom pool configuration (if needed)

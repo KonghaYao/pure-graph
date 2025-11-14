@@ -4,7 +4,7 @@ title: Next.js Chat Application Example
 
 # Next.js Chat Application Example
 
-This example demonstrates how to build a complete chat application using Pure Graph with Next.js, featuring real-time streaming, context-aware responses, and persistent conversations.
+This example demonstrates how to build a complete chat application using Open LangGraph Server with Next.js, featuring real-time streaming, context-aware responses, and persistent conversations.
 
 ## Project Structure
 
@@ -213,7 +213,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-    title: 'Pure Graph Chat',
+    title: 'Open LangGraph Server Chat',
     description: 'AI-powered chat application',
 };
 
@@ -222,7 +222,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <html lang="en">
             <body className="h-screen flex flex-col">
                 <header className="bg-blue-600 text-white p-4">
-                    <h1 className="text-xl font-bold">Pure Graph Chat</h1>
+                    <h1 className="text-xl font-bold">Open LangGraph Server Chat</h1>
                 </header>
                 <main className="flex-1 overflow-hidden">{children}</main>
             </body>
@@ -838,4 +838,4 @@ export function MessageReactions({ messageId, reactions, onReact }: MessageReact
 }
 ```
 
-This example provides a complete, production-ready chat application that demonstrates the full capabilities of Pure Graph. The code is well-structured, type-safe, and includes proper error handling and user experience considerations.
+This example provides a complete, production-ready chat application that demonstrates the full capabilities of Open LangGraph Server. The code is well-structured, type-safe, and includes proper error handling and user experience considerations.

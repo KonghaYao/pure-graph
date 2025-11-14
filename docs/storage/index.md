@@ -4,7 +4,7 @@ title: Storage Backends
 
 # Storage Backends
 
-Pure Graph supports multiple storage backends for persisting graph state, checkpoints, thread metadata, and message queues. Choose the right storage solution based on your application's needs for performance, reliability, and scalability.
+Open LangGraph Server supports multiple storage backends for persisting graph state, checkpoints, thread metadata, and message queues. Choose the right storage solution based on your application's needs for performance, reliability, and scalability.
 
 ## Quick Reference
 
@@ -17,7 +17,7 @@ Pure Graph supports multiple storage backends for persisting graph state, checkp
 
 ## Storage Architecture
 
-Pure Graph uses a layered storage approach where different components can use different storage backends:
+Open LangGraph Server uses a layered storage approach where different components can use different storage backends:
 
 ```
 ┌─────────────────┐
@@ -33,7 +33,7 @@ Each layer can be configured independently based on your performance and reliabi
 
 ## Configuration Priority
 
-Pure Graph automatically selects storage backends based on environment variables with this priority:
+Open LangGraph Server automatically selects storage backends based on environment variables with this priority:
 
 1. **Redis** (if `REDIS_URL` set and `CHECKPOINT_TYPE` matches)
 2. **PostgreSQL** (if `DATABASE_URL` set)

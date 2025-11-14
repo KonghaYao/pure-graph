@@ -2,13 +2,13 @@
 title: 1.x to 2.0
 ---
 
-# Migration Guide: Pure Graph 1.x to 2.0
+# Migration Guide: Open LangGraph Server 1.x to 2.0
 
-This guide helps you migrate your Pure Graph applications from version 1.x to 2.0, which introduces full support for LangGraph 1.0.
+This guide helps you migrate your Open LangGraph Server applications from version 1.x to 2.0, which introduces full support for LangGraph 1.0.
 
 ## Overview
 
-Pure Graph 2.0 introduces several breaking changes and improvements:
+Open LangGraph Server 2.0 introduces several breaking changes and improvements:
 
 -   Full LangGraph 1.0 compatibility
 -   New `entrypoint` API pattern

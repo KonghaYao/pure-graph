@@ -4,11 +4,11 @@ title: Next.js
 
 # Next.js Integration Guide
 
-Pure Graph provides seamless integration with Next.js applications through its App Router. This guide covers everything you need to know to get started with Pure Graph in your Next.js project.
+Open LangGraph Server provides seamless integration with Next.js applications through its App Router. This guide covers everything you need to know to get started with Open LangGraph Server in your Next.js project.
 
 ## Installation
 
-Install Pure Graph alongside your LangGraph dependencies:
+Install Open LangGraph Server alongside your LangGraph dependencies:
 
 ```bash
 npm install @langgraph-js/pure-graph @langchain/langgraph @langchain/core

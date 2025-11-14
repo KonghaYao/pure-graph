@@ -4,11 +4,11 @@ title: Hono.js
 
 # Hono.js Integration Guide
 
-Pure Graph integrates seamlessly with Hono.js applications, providing a lightweight and fast HTTP interface for your LangGraph workflows. This guide covers everything you need to set up and use Pure Graph with Hono.js.
+Open LangGraph Server integrates seamlessly with Hono.js applications, providing a lightweight and fast HTTP interface for your LangGraph workflows. This guide covers everything you need to set up and use Open LangGraph Server with Hono.js.
 
 ## Installation
 
-Install Pure Graph and required dependencies:
+Install Open LangGraph Server and required dependencies:
 
 ```bash
 npm install @langgraph-js/pure-graph @langchain/langgraph @langchain/core hono
@@ -41,7 +41,7 @@ my-hono-app/
 
 ### 1. Create the Main Application
 
-Set up your Hono application with Pure Graph:
+Set up your Hono application with Open LangGraph Server:
 
 ```typescript
 // src/app.ts
@@ -66,7 +66,7 @@ app.use('*', async (c, next) => {
     await next();
 });
 
-// Mount Pure Graph routes
+// Mount Open LangGraph Server routes
 app.route('/api', LangGraphApp);
 
 export default app;

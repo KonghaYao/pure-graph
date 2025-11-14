@@ -1,14 +1,14 @@
 ---
-title: Pure Graph
+title: Open LangGraph Server
 ---
 
-# Pure Graph
+# Open LangGraph Server
 
-Pure Graph is the **LangGraph.js integration library** that brings the power of LangGraph to your favorite JavaScript frameworks. Run LangGraph workflows seamlessly in **Next.js, Hono.js**, and other modern web frameworks with enterprise-grade storage and streaming capabilities.
+Open LangGraph Server is the **LangGraph.js integration library** that brings the power of LangGraph to your favorite JavaScript frameworks. Run LangGraph workflows seamlessly in **Next.js, Hono.js**, and other modern web frameworks with enterprise-grade storage and streaming capabilities.
 
-## What is Pure Graph?
+## What is Open LangGraph Server?
 
-Pure Graph makes it incredibly easy to integrate LangGraph.js into your applications:
+Open LangGraph Server makes it incredibly easy to integrate LangGraph.js into your applications:
 
 -   **Run LangGraph.js Anywhere**: Execute LangGraph workflows in **Next.js, Hono.js**, or any JavaScript framework
 -   **Enterprise Storage**: Multiple storage backends (SQLite, PostgreSQL, Redis) with automatic failover
@@ -19,7 +19,7 @@ Pure Graph makes it incredibly easy to integrate LangGraph.js into your applicat
 
 ## Quick Start
 
-Get started with Pure Graph in minutes:
+Get started with Open LangGraph Server in minutes:
 
 ```bash
 npm install @langgraph-js/pure-graph

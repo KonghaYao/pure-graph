@@ -4,11 +4,11 @@ title: Redis Storage
 
 # Redis Storage
 
-Redis primarily serves as a high-performance message broker for streaming data in Pure Graph. While Redis can also be used for checkpoints when needed, its main role is handling real-time pub/sub messaging for graph execution streams.
+Redis primarily serves as a high-performance message broker for streaming data in Open LangGraph Server. While Redis can also be used for checkpoints when needed, its main role is handling real-time pub/sub messaging for graph execution streams.
 
 ## Overview
 
-Redis is used in Pure Graph mainly for **streaming data synchronization** through pub/sub messaging. It can optionally be used for checkpoint storage, but this is typically not recommended for production use due to data persistence concerns.
+Redis is used in Open LangGraph Server mainly for **streaming data synchronization** through pub/sub messaging. It can optionally be used for checkpoint storage, but this is typically not recommended for production use due to data persistence concerns.
 
 ## Characteristics
 
@@ -59,9 +59,9 @@ CHECKPOINT_TYPE=redis  # Enable Redis checkpoints
 
 **Note:** Redis checkpoints are not recommended for production due to data persistence limitations. Use PostgreSQL or other persistent storage for checkpoints in production.
 
-## Pure Graph Redis Keys
+## Open LangGraph Server Redis Keys
 
-When using Redis, Pure Graph stores data under these key patterns:
+When using Redis, Open LangGraph Server stores data under these key patterns:
 
 ```
 langgraph:queue:*          # Message queues (primary use)
@@ -97,7 +97,7 @@ REDIS_URL=rediss://username:password@secure-host:6380
 
 ## Use Cases
 
-**Primary use in Pure Graph:**
+**Primary use in Open LangGraph Server:**
 
 -   **Message Queues** - Real-time streaming data for graph executions
 -   **Pub/Sub messaging** - Synchronize data between graph components

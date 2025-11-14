@@ -4,7 +4,7 @@ title: Memory Storage
 
 # Memory Storage
 
-Memory storage is the default fallback option for Pure Graph, providing fast in-memory persistence with no external dependencies. It's ideal for development, testing, and stateless applications.
+Memory storage is the default fallback option for Open LangGraph Server, providing fast in-memory persistence with no external dependencies. It's ideal for development, testing, and stateless applications.
 
 ## Overview
 
@@ -23,7 +23,7 @@ Memory storage stores all data in the application's memory space. It's the faste
 # No configuration needed - this is the default
 ```
 
-When no other storage backends are configured, Pure Graph automatically uses memory storage.
+When no other storage backends are configured, Open LangGraph Server automatically uses memory storage.
 
 ## Use Cases
 
@@ -129,7 +129,7 @@ echo "REDIS_URL=redis://localhost:6379" >> .env
 echo "CHECKPOINT_TYPE=redis" >> .env
 ```
 
-Pure Graph will automatically switch to the new storage backend without code changes.
+Open LangGraph Server will automatically switch to the new storage backend without code changes.
 
 ## Monitoring
 

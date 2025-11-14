@@ -1,19 +1,19 @@
-# Pure Graph
+# Open LangGraph Server
 
-Pure Graph is a library that provides a standard LangGraph endpoint for integrating into various frameworks like NextJS and Hono.js. It supports multiple storage backends (SQLite, PostgreSQL, Redis) and message queues.
+Open LangGraph Server is a library that provides a standard LangGraph endpoint for integrating into various frameworks like NextJS and Hono.js. It supports multiple storage backends (SQLite, PostgreSQL, Redis) and message queues.
 
 ## 📢 Version Compatibility
 
--   **Pure Graph 2.0+**: Supports LangGraph 1.0+
--   **Pure Graph 1.x**: Compatible with LangGraph 0.1+
+-   **Open LangGraph Server 2.0+**: Supports LangGraph 1.0+
+-   **Open LangGraph Server 1.x**: Compatible with LangGraph 0.1+
 
 ### Migration Guide
 
-For detailed migration instructions from Pure Graph 1.x to 2.0, see our [Migration Guide](https://pure-graph.netlify.app/docs/migration-2.0).
+For detailed migration instructions from Open LangGraph Server 1.x to 2.0, see our [Migration Guide](https://pure-graph.netlify.app/docs/migration-2.0).
 
 📚 **[Complete Documentation](https://pure-graph.netlify.app/docs/index.md)** - Comprehensive guides, API reference, and examples
 
-This document will guide you on how to use Pure Graph in your projects.
+This document will guide you on how to use Open LangGraph Server in your projects.
 
 ## Features
 
@@ -24,7 +24,7 @@ This document will guide you on how to use Pure Graph in your projects.
 
 ## Installation
 
-First, you need to install the Pure Graph package. You can do this using npm or yarn.
+First, you need to install the Open LangGraph Server package. You can do this using npm or yarn.
 
 ```sh
 npm install @langgraph-js/pure-graph
@@ -59,7 +59,7 @@ my-nextjs-app/
 └── tsconfig.json                 # TypeScript configuration
 ```
 
-To integrate Pure Graph into a Next.js project, follow these steps:
+To integrate Open LangGraph Server into a Next.js project, follow these steps:
 
 1. **Create a Route Handler**
 
@@ -114,7 +114,7 @@ To integrate Pure Graph into a Next.js project, follow these steps:
 
 ### Hono.js Example
 
-To integrate Pure Graph into a Hono.js project, follow these steps:
+To integrate Open LangGraph Server into a Hono.js project, follow these steps:
 
 1. **Create a Hono Application**
 
@@ -202,7 +202,7 @@ To integrate Pure Graph into a Hono.js project, follow these steps:
 
 ## Context Passing
 
-Pure Graph supports passing custom context data to your graphs, which can be accessed via `getConfig().configurable` in your graph logic. This allows you to inject user-specific data, session information, or any other custom data into your LangGraph workflows.
+Open LangGraph Server supports passing custom context data to your graphs, which can be accessed via `getConfig().configurable` in your graph logic. This allows you to inject user-specific data, session information, or any other custom data into your LangGraph workflows.
 
 ### Graph Code Example
 
@@ -357,7 +357,7 @@ Here are the environment variables you need to configure:
 
 ## Persistence Configuration
 
-Pure Graph supports multiple storage backends for persisting graph state, checkpoints, and thread data. Choose the appropriate storage type based on your requirements for scalability, persistence, and performance.
+Open LangGraph Server supports multiple storage backends for persisting graph state, checkpoints, and thread data. Choose the appropriate storage type based on your requirements for scalability, persistence, and performance.
 
 ### Memory Storage (Default)
 
@@ -434,7 +434,7 @@ unset DATABASE_INIT
 
 ### Redis Storage
 
-Pure Graph supports two Redis checkpoint modes:
+Open LangGraph Server supports two Redis checkpoint modes:
 
 #### Full Redis Checkpoint
 

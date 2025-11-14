@@ -4,7 +4,7 @@ title: Advanced Usage Guide
 
 # Advanced Usage Guide
 
-This guide covers advanced Pure Graph features including context passing, custom graphs, middleware patterns, performance optimization, and enterprise deployment strategies.
+This guide covers advanced Open LangGraph Server features including context passing, custom graphs, middleware patterns, performance optimization, and enterprise deployment strategies.
 
 ## Context Passing and Injection
 
@@ -732,7 +732,7 @@ process.on('SIGINT', async () => {
 ### Query Optimization and Indexing
 
 ```sql
--- Optimized indexes for Pure Graph
+-- Optimized indexes for Open LangGraph Server
 CREATE INDEX CONCURRENTLY idx_threads_user_status ON threads(user_id, status) WHERE user_id IS NOT NULL;
 CREATE INDEX CONCURRENTLY idx_runs_thread_created ON runs(thread_id, created_at DESC);
 CREATE INDEX CONCURRENTLY idx_checkpoints_thread_checkpoint ON checkpoints(thread_id, checkpoint_id);
@@ -1161,4 +1161,4 @@ export function monitoringMiddleware(monitor: MonitoringSystem) {
 }
 ```
 
-This advanced usage guide covers sophisticated patterns for building production-ready applications with Pure Graph. Each pattern includes practical examples and best practices for scalability, reliability, and maintainability.
+This advanced usage guide covers sophisticated patterns for building production-ready applications with Open LangGraph Server. Each pattern includes practical examples and best practices for scalability, reliability, and maintainability.

@@ -4,7 +4,7 @@ title: API Reference
 
 # API Reference
 
-Pure Graph provides a comprehensive REST API that follows the LangGraph SDK specification. This reference covers all available endpoints, request/response formats, and usage examples.
+Open LangGraph Server provides a comprehensive REST API that follows the LangGraph SDK specification. This reference covers all available endpoints, request/response formats, and usage examples.
 
 ## Base URL
 
@@ -15,7 +15,7 @@ All API endpoints are relative to your configured base path:
 
 ## Authentication
 
-Pure Graph relies on your framework's authentication mechanisms. Context can be injected via:
+Open LangGraph Server relies on your framework's authentication mechanisms. Context can be injected via:
 
 -   **Next.js**: `x-langgraph-context` header (set by middleware)
 -   **Hono.js**: `langgraph_context` variable (set by middleware)
@@ -621,7 +621,7 @@ export function middleware(request: NextRequest) {
 
 ## SDK Compatibility
 
-Pure Graph maintains compatibility with the LangGraph SDK, supporting all standard operations while adding framework-specific enhancements.
+Open LangGraph Server maintains compatibility with the LangGraph SDK, supporting all standard operations while adding framework-specific enhancements.
 
 ### LangGraph SDK Features Supported
 
@@ -633,7 +633,7 @@ Pure Graph maintains compatibility with the LangGraph SDK, supporting all standa
 -   ✅ Error handling
 -   ✅ Type safety
 
-### Additional Pure Graph Features
+### Additional Open LangGraph Server Features
 
 -   🔧 **Framework Integration** - Native Next.js and Hono.js support
 -   💾 **Multiple Storage Backends** - SQLite, PostgreSQL, Redis, Memory
