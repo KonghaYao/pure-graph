@@ -101,7 +101,7 @@ export const createEndpoint = () => {
                     yield data;
                 }
             },
-            joinStream(
+            async *joinStream(
                 threadId: string,
                 runId: string,
                 options?:
@@ -113,7 +113,45 @@ export const createEndpoint = () => {
                       }
                     | AbortSignal,
             ): AsyncGenerator<{ id?: string; event: StreamEvent; data: any }> {
-                throw new Error('Function not implemented.');
+                // 处理参数兼容性
+                const config = options && typeof options === 'object' && 'signal' in options ? options : {};
+                const signal =
+                    (options instanceof AbortSignal ? options : config.signal) || new AbortController().signal;
+
+                try {
+                    // 获取 Redis 队列实例
+                    const queue = LangGraphGlobal.globalMessageQueue.getQueue(runId);
+
+                    // 监听队列数据并转换格式
+                    for await (const eventMessage of queue.onDataReceive()) {
+                        // 检查是否被取消
+                        if (signal.aborted) {
+                            break;
+                        }
+
+                        // 转换 EventMessage 为期望的格式
+                        const event = eventMessage.event as unknown as StreamEvent;
+                        const data = eventMessage.data;
+
+                        yield {
+                            id: eventMessage.id,
+                            event,
+                            data,
+                        };
+
+                        // 如果是流结束信号，停止监听
+                        if (
+                            eventMessage.event === '__stream_end__' ||
+                            eventMessage.event === '__stream_error__' ||
+                            eventMessage.event === '__stream_cancel__'
+                        ) {
+                            break;
+                        }
+                    }
+                } catch (error) {
+                    // 如果队列不存在或其他错误，记录警告但不抛出错误
+                    console.warn('Join stream failed:', error);
+                }
             },
         },
     };

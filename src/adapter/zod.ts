@@ -113,6 +113,12 @@ export const RunCancelQuerySchema = z.object({
     action: z.enum(['interrupt', 'rollback']).optional().default('interrupt'),
 });
 
+export const RunJoinStreamQuerySchema = z.object({
+    cancel_on_disconnect: z.coerce.boolean().optional().default(false),
+    last_event_id: z.string().optional(),
+    stream_mode: z.enum(['values', 'messages', 'messages-tuple', 'updates', 'events', 'debug', 'custom']).optional(),
+});
+
 // Threads 相关的 schema
 export const ThreadCreatePayloadSchema = z
     .object({

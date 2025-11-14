@@ -8,6 +8,7 @@ import {
     RunStreamPayloadSchema,
     RunListQuerySchema,
     RunCancelQuerySchema,
+    RunJoinStreamQuerySchema,
     ThreadStateUpdate,
 } from '../zod';
 import { serialiseAsDict } from '../../graph/stream';
@@ -109,6 +110,64 @@ api.post(
                     camelcaseKeys(payload) as any,
                 )) {
                     await stream.writeSSE({ data: serialiseAsDict(data) ?? '', event });
+                }
+            }),
+        );
+    },
+);
+
+// 加入现有流的 GET 接口
+api.get(
+    '/threads/:thread_id/runs/:run_id/stream',
+    zValidator('param', RunIdParamSchema),
+    zValidator('query', RunJoinStreamQuerySchema),
+    async (c) => {
+        const { thread_id, run_id } = c.req.valid('param');
+        const { cancel_on_disconnect, last_event_id, stream_mode } = c.req.valid('query');
+
+        return streamSSE(
+            c,
+            withHeartbeat(async (stream) => {
+                // 创建 AbortController 用于处理取消信号
+                const controller = new AbortController();
+
+                // 如果需要断开连接时取消，则监听连接断开事件
+                if (cancel_on_disconnect) {
+                    const cleanup = () => {
+                        controller.abort('Client disconnected');
+                    };
+
+                    // 监听连接断开事件
+                    c.req.raw.signal?.addEventListener('abort', cleanup);
+                    stream.onAbort = cleanup;
+                }
+
+                try {
+                    // 使用 joinStream 方法加入现有流
+                    for await (const { event, data, id } of client.runs.joinStream(thread_id, run_id, {
+                        signal: controller.signal,
+                        cancelOnDisconnect: cancel_on_disconnect,
+                        lastEventId: last_event_id,
+                        streamMode: stream_mode ? [stream_mode] : undefined,
+                    })) {
+                        // 发送 SSE 事件
+                        await stream.writeSSE({
+                            data: serialiseAsDict(data) ?? '',
+                            event: event as unknown as string,
+                            id,
+                        });
+                    }
+                } catch (error) {
+                    // 如果不是用户取消导致的错误，则发送错误事件
+                    if (!(error instanceof Error) || !error.message.includes('user cancel')) {
+                        console.error('Join stream error:', error);
+                        await stream.writeSSE({
+                            event: 'error',
+                            data: JSON.stringify({
+                                error: error instanceof Error ? error.message : 'Unknown error',
+                            }),
+                        });
+                    }
                 }
             }),
         );

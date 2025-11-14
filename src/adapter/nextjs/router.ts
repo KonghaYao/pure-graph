@@ -7,6 +7,7 @@ import {
     RunStreamPayloadSchema,
     RunListQuerySchema,
     RunCancelQuerySchema,
+    RunJoinStreamQuerySchema,
     ThreadCreatePayloadSchema,
     ThreadSearchPayloadSchema,
     ThreadStateUpdate,
@@ -90,6 +91,60 @@ export async function GET(req: NextRequest) {
                 status: parsedStatus,
             });
             return Response.json(runs);
+        }
+    }
+
+    // Runs join stream route
+    if (pathname.match(/\/threads\/[0-9a-fA-F-]{36}\/runs\/[0-9a-fA-F-]{36}\/stream$/)) {
+        const match = pathname.match(/\/threads\/([0-9a-fA-F-]{36})\/runs\/([0-9a-fA-F-]{36})\/stream$/);
+        if (match) {
+            const thread_id = match[1];
+            const run_id = match[2];
+
+            // 解析查询参数
+            const cancel_on_disconnect = url.searchParams.get('cancel_on_disconnect') ?? undefined;
+            const last_event_id = url.searchParams.get('last_event_id') ?? undefined;
+            const stream_mode = url.searchParams.get('stream_mode') ?? undefined;
+
+            const queryParams = {
+                cancel_on_disconnect: cancel_on_disconnect ? cancel_on_disconnect === 'true' : false,
+                last_event_id,
+                stream_mode,
+            };
+            const {
+                cancel_on_disconnect: parsedCancelOnDisconnect,
+                last_event_id: parsedLastEventId,
+                stream_mode: parsedStreamMode,
+            } = RunJoinStreamQuerySchema.parse(queryParams);
+
+            // 创建 AbortController 用于处理取消信号
+            const controller = new AbortController();
+
+            // 如果需要断开连接时取消，则监听请求信号
+            if (parsedCancelOnDisconnect && req.signal) {
+                req.signal.addEventListener('abort', () => {
+                    controller.abort('Client disconnected');
+                });
+            }
+
+            // 创建带 ID 的生成器
+            async function* joinStreamGenerator() {
+                try {
+                    for await (const { event, data, id } of client.runs.joinStream(thread_id, run_id, {
+                        signal: controller.signal,
+                        cancelOnDisconnect: parsedCancelOnDisconnect,
+                        lastEventId: parsedLastEventId,
+                        streamMode: parsedStreamMode ? [parsedStreamMode] : undefined,
+                    })) {
+                        yield { event: event as unknown as string, data, id };
+                    }
+                } catch (error) {
+                    // 记录错误但不抛出，避免中断流
+                    console.error('Join stream error:', error);
+                }
+            }
+
+            return sseResponse(joinStreamGenerator());
         }
     }
 
