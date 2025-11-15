@@ -15,8 +15,8 @@ export const ArtifactCommandSchema = {
         .describe(
             "The actual content to be created. Don't Reply These Code to User, User can see these code in artifacts. If you need to update the content, use the 'update' command. content can be empty if you need to update a new artifact.",
         ),
-    old_str: z.string().describe('The existing content to be replaced (for update operations)'),
-    new_str: z.string().describe('The new content to replace the old content (for update operations)'),
+    old_str: z.string().optional().describe('The existing content to be replaced (for update operations)'),
+    new_str: z.string().optional().describe('The new content to replace the old content (for update operations)'),
 };
 export type ArtifactCommand = z.infer<z.ZodObject<typeof ArtifactCommandSchema>>;
 export const create_artifacts = tool(
@@ -24,7 +24,7 @@ export const create_artifacts = tool(
         return 'Artifact operation completed successfully';
     },
     {
-        name: 'create_artifacts',
+        name: 'create_artifacts_',
         description: `
 What is Artifact
 

@@ -55,7 +55,7 @@
         "eventemitter3": "^5.0.1",
         "kysely": "^0.28.8",
         "langchain": "^1.0.1",
-        "zod": "^3"
+        "zod": "^4"
     },
     "optionalDependencies": {
         "@hono/zod-validator": "^0.7.3",
@@ -69,7 +69,7 @@
     "devDependencies": {
         "@langchain/langgraph-sdk": "^1.0.0",
         "@langchain/openai": "^1.0.0",
-        "@langgraph-js/sdk": "^3.0.1",
+        "@langgraph-js/sdk": "^3.3.1",
         "@types/node": "^22.13.5",
         "@types/pg": "^8.15.5",
         "rollup-plugin-node-externals": "^8.1.1",

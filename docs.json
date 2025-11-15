@@ -6,9 +6,6 @@
             "content": "Open LangGraph Server Docs",
             "label": "Open LangGraph Server Docs",
             "icon": "sparkles"
-        },
-        "fonts": {
-            "family": "system-ui"
         }
     },
     "navigation": {
