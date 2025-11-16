@@ -13,12 +13,12 @@
             {
                 "title": "Getting Started",
                 "page": "overview",
-                "href": "docs/getting-start"
+                "href": "docs/getting-started/overview"
             },
             {
                 "title": "Core Concepts",
                 "page": "core-concepts",
-                "href": "docs/overview"
+                "href": "docs/getting-started/architecture"
             },
 
             {
@@ -29,19 +29,19 @@
             {
                 "title": "Auth",
                 "page": "auth",
-                "href": "docs/auth/index"
+                "href": "docs/auth/overview"
             },
             {
                 "title": "API Reference",
                 "page": "api",
-                "href": "docs/api/index"
+                "href": "docs/api/overview"
             }
         ],
         "sidebar": [
             {
                 "group": "Getting Started",
                 "pages": [
-                    "docs/getting-started/index",
+                    "docs/getting-started/overview",
                     "docs/getting-started/architecture",
                     "docs/getting-started/install",
                     "docs/getting-started/project-structure",
@@ -56,7 +56,7 @@
             {
                 "group": "Database",
                 "pages": [
-                    "docs/storage/index",
+                    "docs/storage/overview",
                     "docs/storage/memory",
                     "docs/storage/sqlite",
                     "docs/storage/postgres",
@@ -66,15 +66,15 @@
 
             {
                 "group": "Auth",
-                "pages": ["docs/auth/index", "docs/auth/better-auth", "docs/auth/custom-auth"]
+                "pages": ["docs/auth/overview", "docs/auth/better-auth", "docs/auth/custom-auth"]
             },
             {
                 "group": "Advanced Usage",
-                "pages": ["docs/advanced/index"]
+                "pages": ["docs/advanced/overview"]
             },
             {
                 "group": "API Reference",
-                "pages": ["docs/api/index"]
+                "pages": ["docs/api/overview"]
             },
             {
                 "group": "Examples",
@@ -89,7 +89,7 @@
     "redirects": [
         {
             "source": "index",
-            "destination": "docs/getting-start"
+            "destination": "docs/getting-started/overview"
         }
     ],
     "seo": {

@@ -4,12 +4,12 @@ publish = ".xyd/build/client"
 
 [[redirects]]
 from = "/"
-to = "/docs/getting-started"
+to = "/docs/getting-started/overview"
 status = 301
 force = true
 
 [[redirects]]
 from = "/index.html"
-to = "/docs/getting-started"
+to = "/docs/getting-started/overview"
 status = 301
 force = true
