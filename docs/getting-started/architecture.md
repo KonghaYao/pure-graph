@@ -13,7 +13,7 @@ The architecture follows a layered approach that separates concerns while mainta
 ```
 ┌────────────────────┐    ┌────────────────────────────┐    ┌────────────────────┐
 │   Framework        │    │    Open LangGraph Server   │    │    LangGraph       │
-│   Adapters         │◄──►│         API Layer         │◄──►│    Workflows       │
+│   Adapters         │◄──►│         API Layer          │◄──►│    Workflows       │
 │                    │    │                            │    │                    │
 │ • Next.js          │    │ • REST Endpoints           │    │ • StateGraphs      │
 │ • Hono.js          │    │ • Type Validation          │    │ • Agents           │
