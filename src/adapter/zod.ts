@@ -29,8 +29,8 @@ export const MetadataSchema = z
     .object({
         source: z.union([z.literal('input'), z.literal('loop'), z.literal('update'), z.string()]).optional(),
         step: z.number().optional(),
-        writes: z.record(z.unknown()).nullable().optional(),
-        parents: z.record(z.string()).optional(),
+        writes: z.any().nullable().optional(),
+        parents: z.any().optional(),
     })
     .catchall(z.unknown());
 
@@ -41,7 +41,7 @@ export const SendSchema = z.object({
 
 export const CommandSchema = z.object({
     update: z
-        .union([z.record(z.unknown()), z.array(z.tuple([z.string(), z.unknown()]))])
+        .union([z.any(), z.array(z.tuple([z.string(), z.any()]))])
         .nullable()
         .optional(),
     resume: z.unknown().optional(),
@@ -130,9 +130,9 @@ export const ThreadCreatePayloadSchema = z
 
 export const ThreadSearchPayloadSchema = z
     .object({
-        metadata: z.record(z.unknown()).describe('Metadata to search for.').optional(),
+        metadata: MetadataSchema.describe('Metadata to search for.').optional(),
         status: z.enum(['idle', 'busy', 'interrupted', 'error']).describe('Filter by thread status.').optional(),
-        values: z.record(z.unknown()).describe('Filter by thread values.').optional(),
+        values: z.any().describe('Filter by thread values.').optional(),
         limit: z.number().int().gte(1).lte(1000).describe('Maximum number to return.').optional(),
         offset: z.number().int().gte(0).describe('Offset to start from.').optional(),
         sort_by: z.enum(['thread_id', 'status', 'created_at', 'updated_at']).describe('Sort by field.').optional(),

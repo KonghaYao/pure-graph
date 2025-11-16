@@ -50,7 +50,7 @@ npm install @langgraph-js/pure-graph @langchain/langgraph @langchain/core @langc
 # OpenAI API Key
 OPENAI_API_KEY=your_openai_api_key
 
-# Storage Configuration (choose one)
+# Database Configuration (choose one)
 SQLITE_DATABASE_URI=./.langgraph_api/chat.db
 # DATABASE_URL=postgresql://user:pass@localhost:5432/chat_db
 # REDIS_URL=redis://localhost:6379

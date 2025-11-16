@@ -20,10 +20,16 @@
                 "page": "core-concepts",
                 "href": "docs/overview"
             },
+
             {
                 "title": "Framework Integration",
                 "page": "frameworks",
                 "href": "docs/frameworks/nextjs"
+            },
+            {
+                "title": "Auth",
+                "page": "auth",
+                "href": "docs/auth/index"
             },
             {
                 "title": "API Reference",
@@ -34,14 +40,21 @@
         "sidebar": [
             {
                 "group": "Getting Started",
-                "pages": ["docs/getting-start", "docs/overview"]
+                "pages": [
+                    "docs/getting-started/index",
+                    "docs/getting-started/architecture",
+                    "docs/getting-started/install",
+                    "docs/getting-started/project-structure",
+                    "docs/getting-started/studio"
+                ]
             },
+
             {
                 "group": "Framework Integration",
                 "pages": ["docs/frameworks/nextjs", "docs/frameworks/hono"]
             },
             {
-                "group": "Storage & Configuration",
+                "group": "Database",
                 "pages": [
                     "docs/storage/index",
                     "docs/storage/memory",
@@ -50,13 +63,18 @@
                     "docs/storage/redis"
                 ]
             },
+
             {
-                "group": "API Reference",
-                "pages": ["docs/api/index"]
+                "group": "Auth",
+                "pages": ["docs/auth/index", "docs/auth/better-auth", "docs/auth/custom-auth"]
             },
             {
                 "group": "Advanced Usage",
                 "pages": ["docs/advanced/index"]
+            },
+            {
+                "group": "API Reference",
+                "pages": ["docs/api/index"]
             },
             {
                 "group": "Examples",
@@ -75,6 +93,6 @@
         }
     ],
     "seo": {
-        "domain": "https://pure-graph.netlify.app"
+        "domain": "https://open-langgraph-server.agent-aura.top"
     }
 }

@@ -129,7 +129,7 @@ Configure your storage backend and other settings:
 
 ```bash
 # .env.local
-# Storage Configuration
+# Database Configuration
 SQLITE_DATABASE_URI=./.langgraph_api/chat.db
 # or for PostgreSQL:
 # DATABASE_URL=postgresql://username:password@localhost:5432/langgraph_db

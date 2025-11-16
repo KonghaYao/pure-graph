@@ -1,14 +1,14 @@
 ---
-title: Storage Backends
+title: Database
 ---
 
-# Storage Backends
+# Database
 
-Open LangGraph Server supports multiple storage backends for persisting graph state, checkpoints, thread metadata, and message queues. Choose the right storage solution based on your application's needs for performance, reliability, and scalability.
+Open LangGraph Server supports multiple database backends for persisting graph state, checkpoints, thread metadata, and message queues. Choose the right database solution based on your application's needs for performance, reliability, and scalability.
 
 ## Quick Reference
 
-| Storage                              | Performance        | Persistence   | Scalability      | Use Case            |
+| Database                             | Performance        | Persistence   | Scalability      | Use Case            |
 | ------------------------------------ | ------------------ | ------------- | ---------------- | ------------------- |
 | [Memory](/docs/storage/memory)       | ⚡ Highest         | ❌ None       | 🧵 Single        | Development/Testing |
 | [SQLite](/docs/storage/sqlite)       | 🚀 Fast            | 💾 File-based | 🖥️ Single-server | Small apps          |

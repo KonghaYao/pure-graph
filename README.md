@@ -9,9 +9,9 @@ Open LangGraph Server is a library that provides a standard LangGraph endpoint f
 
 ### Migration Guide
 
-For detailed migration instructions from Open LangGraph Server 1.x to 2.0, see our [Migration Guide](https://pure-graph.netlify.app/docs/migration-2.0).
+For detailed migration instructions from Open LangGraph Server 1.x to 2.0, see our [Migration Guide](https://open-langgraph-server.agent-aura.top/docs/migration-2.0).
 
-📚 **[Complete Documentation](https://pure-graph.netlify.app/docs/index.md)** - Comprehensive guides, API reference, and examples
+📚 **[Complete Documentation](https://open-langgraph-server.agent-aura.top/docs/index.md)** - Comprehensive guides, API reference, and examples
 
 This document will guide you on how to use Open LangGraph Server in your projects.
 

@@ -144,7 +144,7 @@ Configure storage and other settings:
 
 ```bash
 # .env
-# Storage Configuration
+# Database Configuration
 SQLITE_DATABASE_URI=./.langgraph_api/chat.db
 
 # Or for PostgreSQL:
