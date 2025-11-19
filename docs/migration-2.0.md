@@ -247,5 +247,5 @@ registerGraph('my-agent', graph);
 ### Need Help?
 
 -   Check the [API documentation](./api/index.md)
--   Review the [examples](./examples/)
+-   Review the [examples](./examples/nextjs-chat.md)
 -   Open an issue on [GitHub](https://github.com/KonghaYao/open-langgraph-server/issues)

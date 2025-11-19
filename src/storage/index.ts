@@ -36,7 +36,7 @@ export const createCheckPointer = async () => {
     if (process.env.SQLITE_DATABASE_URI) {
         console.debug('LG | Using sqlite as checkpoint');
         const { SqliteSaver } = await import('./sqlite/checkpoint');
-        const db = SqliteSaver.fromConnString(process.env.SQLITE_DATABASE_URI);
+        const db = await SqliteSaver.fromConnStringAsync(process.env.SQLITE_DATABASE_URI);
         return db;
     }
     return new MemorySaver();

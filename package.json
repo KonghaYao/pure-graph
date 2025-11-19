@@ -1,6 +1,6 @@
 {
     "name": "@langgraph-js/pure-graph",
-    "version": "2.4.1",
+    "version": "2.5.0",
     "description": "A library that provides a standard LangGraph endpoint for integrating into various frameworks like Next.js and Hono.js, with support for multiple storage backends (SQLite, PostgreSQL, Redis) and message queues.",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -14,7 +14,7 @@
         "dev": "bun run --port 8123 test/hono.ts",
         "dev:docs": "bunx --bun xyd-js",
         "build": " vite build && tsc",
-        "build:docs": "npx xyd-js build",
+        "docs:build": "pnpx xyd-js build",
         "prepublish": "pnpm build"
     },
     "keywords": [
@@ -44,12 +44,11 @@
     },
     "author": "KonghaYao<3446798488@qq.com>",
     "license": "MIT",
-    "packageManager": "pnpm@10.6.2",
+    "packageManager": "pnpm@10.22.0",
     "dependencies": {
         "@langchain/core": "^1.0.1",
         "@langchain/langgraph": "^1.0.0",
         "@langchain/langgraph-checkpoint": "^1.0.0",
-        "@langchain/langgraph-checkpoint-sqlite": "^1.0.0",
         "@langgraph-js/pro": "^2.0.0",
         "camelcase-keys": "^10.0.0",
         "eventemitter3": "^5.0.1",
@@ -61,6 +60,7 @@
         "@hono/zod-validator": "^0.7.3",
         "@langchain/langgraph-checkpoint-postgres": "^1.0.0",
         "@langchain/langgraph-checkpoint-redis": "^1.0.0",
+        "kysely-bun-worker": "^1.2.1",
         "better-sqlite3": "^12",
         "hono": "^4.9.9",
         "pg": "^8.16.3",

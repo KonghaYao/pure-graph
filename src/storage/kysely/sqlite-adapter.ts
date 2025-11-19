@@ -10,12 +10,8 @@ import { Database } from './types';
  */
 export class SQLiteAdapter implements DatabaseAdapter {
     db: Kysely<Database>;
-    constructor(public database: any) {
-        this.db = new Kysely<Database>({
-            dialect: new SqliteDialect({
-                database: database,
-            }),
-        });
+    constructor(database: Kysely<any>) {
+        this.db = database;
     }
     dateToDb(date: Date): string {
         // SQLite 存储为 ISO 8601 字符串
@@ -69,7 +65,7 @@ export class SQLiteAdapter implements DatabaseAdapter {
                 updated_at TEXT NOT NULL,
                 metadata TEXT NOT NULL DEFAULT '{}',
                 status TEXT NOT NULL DEFAULT 'idle',
-                values TEXT,
+                "values" TEXT,
                 interrupts TEXT NOT NULL DEFAULT '{}'
             )
         `.execute(db);

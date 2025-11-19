@@ -17,12 +17,12 @@ importers:
       '@langchain/langgraph-checkpoint':
         specifier: ^1.0.0
         version: 1.0.0(@langchain/core@1.0.3(openai@6.7.0(zod@4.1.12)))
-      '@langchain/langgraph-checkpoint-sqlite':
-        specifier: ^1.0.0
-        version: 1.0.0(@langchain/core@1.0.3(openai@6.7.0(zod@4.1.12)))(@langchain/langgraph-checkpoint@1.0.0(@langchain/core@1.0.3(openai@6.7.0(zod@4.1.12))))
       '@langgraph-js/pro':
         specifier: ^2.0.0
         version: 2.0.0(openai@6.7.0(zod@4.1.12))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(zod-to-json-schema@3.24.6(zod@4.1.12))
+      '@meck93/kysely-bun-sqlite':
+        specifier: ^0.2.0
+        version: 0.2.0(kysely@0.28.8)
       camelcase-keys:
         specifier: ^10.0.0
         version: 10.0.0
@@ -32,6 +32,9 @@ importers:
       kysely:
         specifier: ^0.28.8
         version: 0.28.8
+      kysely-bun-sqlite:
+        specifier: ^0.3.2
+        version: 0.3.2(@types/react@19.1.16)(kysely@0.28.8)
       langchain:
         specifier: ^1.0.1
         version: 1.0.3(@langchain/core@1.0.3(openai@6.7.0(zod@4.1.12)))(openai@6.7.0(zod@4.1.12))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(zod-to-json-schema@3.24.6(zod@4.1.12))
@@ -62,7 +65,7 @@ importers:
         version: 5.9.2
       vite:
         specifier: ^7.1.12
-        version: 7.1.12(@types/node@22.18.6)(jiti@2.6.0)(lightningcss@1.30.1)(yaml@2.8.1)
+        version: 7.1.12(@types/node@22.18.6)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.8.1)
     optionalDependencies:
       '@hono/zod-validator':
         specifier: ^0.7.3
@@ -79,6 +82,9 @@ importers:
       hono:
         specifier: ^4.9.9
         version: 4.9.9
+      kysely-bun-worker:
+        specifier: ^1.2.1
+        version: 1.2.1(bun-types@1.3.2(@types/react@19.1.16))(kysely@0.28.8)
       pg:
         specifier: ^8.16.3
         version: 8.16.3
@@ -124,13 +130,13 @@ importers:
     dependencies:
       '@langchain/mcp-adapters':
         specifier: ^1.0.0
-        version: 1.0.0(@langchain/core@1.0.3(openai@6.7.0(zod@4.1.12)))(@langchain/langgraph@1.0.1(@langchain/core@1.0.3(openai@6.7.0(zod@4.1.12)))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(zod-to-json-schema@3.24.6(zod@4.1.12))(zod@4.1.12))
+        version: 1.0.0(@langchain/core@1.0.3(openai@6.7.0(zod@3.25.76)))(@langchain/langgraph@1.0.1(@langchain/core@1.0.3(openai@6.7.0(zod@3.25.76)))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(zod-to-json-schema@3.24.6(zod@3.25.76))(zod@3.25.76))
       '@langchain/openai':
         specifier: ^1.0.0
-        version: 1.0.0(@langchain/core@1.0.3(openai@6.7.0(zod@4.1.12)))
+        version: 1.0.0(@langchain/core@1.0.3(openai@6.7.0(zod@3.25.76)))
       '@langchain/tavily':
         specifier: ^1.0.0
-        version: 1.0.0(@langchain/core@1.0.3(openai@6.7.0(zod@4.1.12)))
+        version: 1.0.0(@langchain/core@1.0.3(openai@6.7.0(zod@3.25.76)))
       '@langgraph-js/pure-graph':
         specifier: workspace:^*
         version: link:../..
@@ -515,13 +521,6 @@ packages:
       '@langchain/core': ^1.0.1
       '@langchain/langgraph-checkpoint': ^1.0.0
 
-  '@langchain/langgraph-checkpoint-sqlite@1.0.0':
-    resolution: {integrity: sha512-0YL5A5YiC7e85JGJqTXy92iLHWqIMKzbTw88/gnM1UjArG289s4fITPkJlD6I04j5uOcjHXUVeBfBLgRTm7R0w==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      '@langchain/core': ^1.0.1
-      '@langchain/langgraph-checkpoint': ^1.0.0
-
   '@langchain/langgraph-checkpoint@1.0.0':
     resolution: {integrity: sha512-xrclBGvNCXDmi0Nz28t3vjpxSH6UYx6w5XAXSiiB1WEdc2xD2iY/a913I3x3a31XpInUW/GGfXXfePfaghV54A==}
     engines: {node: '>=18'}
@@ -598,6 +597,11 @@ packages:
         optional: true
       vue:
         optional: true
+
+  '@meck93/kysely-bun-sqlite@0.2.0':
+    resolution: {integrity: sha512-Xwg4/pOIMb2XpQA/bvIpE4ITx2xcQmSW8EDwPowRPIwpCrAGYiUyrukLUPVcqtli2fIAPMY7RcJ9VoLj6ZCY/Q==}
+    peerDependencies:
+      kysely: ^0.28.2
 
   '@modelcontextprotocol/sdk@1.18.2':
     resolution: {integrity: sha512-beedclIvFcCnPrYgHsylqiYJVJ/CI47Vyc4tY8no1/Li/O8U4BTlJfy6ZwxkYwx+Mx10nrgwSVrA7VBbhh4slg==}
@@ -1107,9 +1111,6 @@ packages:
   bcrypt-pbkdf@1.0.2:
     resolution: {integrity: sha512-qeFIXtP4MSoi6NLqO12WfqARWWuCKi2Rn/9hJLEmtB5yTNr9DqFWkJRCf2qShWzPeAMRnOgCrq0sg/KLv5ES9w==}
 
-  better-sqlite3@11.10.0:
-    resolution: {integrity: sha512-EwhOpyXiOEL/lKzHz9AW1msWFNzGc/z+LzeB3/jnFJpxu+th2yqvzsSWas1v9jgs9+xiXJcD5A8CJxAG2TaghQ==}
-
   better-sqlite3@12.4.1:
     resolution: {integrity: sha512-3yVdyZhklTiNrtg+4WqHpJpFDd+WHTg2oM7UcR80GqL05AOV0xEJzc6qNvFYoEtE+hRp1n9MpN6/+4yhlGkDXQ==}
     engines: {node: 20.x || 22.x || 23.x || 24.x}
@@ -1140,6 +1141,11 @@ packages:
   buildcheck@0.0.6:
     resolution: {integrity: sha512-8f9ZJCUXyT1M35Jx7MkBgmBMo3oHTTBIPLiY9xyL0pl3T5RwcPEY8cUHr5LBNfu/fk6c2T4DJZuVM/8ZZT2D2A==}
     engines: {node: '>=10.0.0'}
+
+  bun-types@1.3.2:
+    resolution: {integrity: sha512-i/Gln4tbzKNuxP70OWhJRZz1MRfvqExowP7U6JKoI8cntFrtxg7RJK3jvz7wQW54UuvNC8tbKHHri5fy74FVqg==}
+    peerDependencies:
+      '@types/react': ^19
 
   byline@5.0.0:
     resolution: {integrity: sha512-s6webAy+R4SR8XVuJWt2V2rGvhnrhxN+9S15GNuTK3wKPOXFF6RNc+8ug2XhH+2s4f+uudG4kUVYmYOQWL2g0Q==}
@@ -1536,6 +1542,10 @@ packages:
     resolution: {integrity: sha512-VXe6RjJkBPj0ohtqaO8vSWP3ZhAKo66fKrFNCll4BTcwljPLz03pCbaNKfzGP5MbrCYcbJ7v0nOYYwUzTEIdXQ==}
     hasBin: true
 
+  jiti@2.6.1:
+    resolution: {integrity: sha512-ekilCSN1jwRvIbgeg/57YFh8qQDNbwDb9xT/qu2DAHbFFZUicIl4ygVaAvzveMhMVr3LnpSKTNnwt8PoOfmKhQ==}
+    hasBin: true
+
   js-tiktoken@1.0.21:
     resolution: {integrity: sha512-biOj/6M5qdgx5TKjDnFT1ymSpM5tbd3ylwDtrQvFQSu0Z7bBYko2dF+W/aUkXUPuk6IVpRxk/3Q2sHOzGlS36g==}
 
@@ -1545,6 +1555,23 @@ packages:
   jsonrepair@3.13.1:
     resolution: {integrity: sha512-WJeiE0jGfxYmtLwBTEk8+y/mYcaleyLXWaqp5bJu0/ZTSeG0KQq/wWQ8pmnkKenEdN6pdnn6QtcoSUkbqDHWNw==}
     hasBin: true
+
+  kysely-bun-sqlite@0.3.2:
+    resolution: {integrity: sha512-YucMcOGGxNCmlAnkvNfTKZX6Bk1sYsuVVXlQN/5ZUgerlq/J9/EuR3aMOOZ25ASLM7oMglSxfeQxkiw0+hrEOQ==}
+    engines: {bun: '>=1'}
+    peerDependencies:
+      kysely: ^0.27.2
+
+  kysely-bun-worker@1.2.1:
+    resolution: {integrity: sha512-mhQ8MQThL8gdyqGf6Jh3GnGrNaaQOxQxplust58kPGN8vB3qov+3W0laEkNacN0ShCBLb8vkLcYK0ShksPlBbQ==}
+    peerDependencies:
+      bun-types: '>=1.1.14'
+      kysely: '>=0.26'
+
+  kysely-generic-sqlite@1.2.1:
+    resolution: {integrity: sha512-/Bs3/Uktn04nQ9g/4oSphLMEtSHkS5+j5hbKjK5gMqXQfqr/v3V3FKtoN4pLTmo2W35hNdrIpQnBukGL1zZc6g==}
+    peerDependencies:
+      kysely: '>=0.26'
 
   kysely@0.28.8:
     resolution: {integrity: sha512-QUOgl5ZrS9IRuhq5FvOKFSsD/3+IA6MLE81/bOOTRA/YQpKDza2sFdN5g6JCB9BOpqMJDGefLCQ9F12hRS13TA==}
@@ -1577,8 +1604,20 @@ packages:
     resolution: {integrity: sha512-b94GiNHQNy6JNTrt5w6zNyffMrNkXZb3KTkCZJb2V1xaEGCk093vkZ2jk3tpaeP33/OiXC+WvK9AxUebnf5nbw==}
     engines: {node: '>= 0.6.3'}
 
+  lightningcss-android-arm64@1.30.2:
+    resolution: {integrity: sha512-BH9sEdOCahSgmkVhBLeU7Hc9DWeZ1Eb6wNS6Da8igvUwAe0sqROHddIlvU06q3WyXVEOYDZ6ykBZQnjTbmo4+A==}
+    engines: {node: '>= 12.0.0'}
+    cpu: [arm64]
+    os: [android]
+
   lightningcss-darwin-arm64@1.30.1:
     resolution: {integrity: sha512-c8JK7hyE65X1MHMN+Viq9n11RRC7hgin3HhYKhrMyaXflk5GVplZ60IxyoVtzILeKr+xAJwg6zK6sjTBJ0FKYQ==}
+    engines: {node: '>= 12.0.0'}
+    cpu: [arm64]
+    os: [darwin]
+
+  lightningcss-darwin-arm64@1.30.2:
+    resolution: {integrity: sha512-ylTcDJBN3Hp21TdhRT5zBOIi73P6/W0qwvlFEk22fkdXchtNTOU4Qc37SkzV+EKYxLouZ6M4LG9NfZ1qkhhBWA==}
     engines: {node: '>= 12.0.0'}
     cpu: [arm64]
     os: [darwin]
@@ -1589,8 +1628,20 @@ packages:
     cpu: [x64]
     os: [darwin]
 
+  lightningcss-darwin-x64@1.30.2:
+    resolution: {integrity: sha512-oBZgKchomuDYxr7ilwLcyms6BCyLn0z8J0+ZZmfpjwg9fRVZIR5/GMXd7r9RH94iDhld3UmSjBM6nXWM2TfZTQ==}
+    engines: {node: '>= 12.0.0'}
+    cpu: [x64]
+    os: [darwin]
+
   lightningcss-freebsd-x64@1.30.1:
     resolution: {integrity: sha512-kmW6UGCGg2PcyUE59K5r0kWfKPAVy4SltVeut+umLCFoJ53RdCUWxcRDzO1eTaxf/7Q2H7LTquFHPL5R+Gjyig==}
+    engines: {node: '>= 12.0.0'}
+    cpu: [x64]
+    os: [freebsd]
+
+  lightningcss-freebsd-x64@1.30.2:
+    resolution: {integrity: sha512-c2bH6xTrf4BDpK8MoGG4Bd6zAMZDAXS569UxCAGcA7IKbHNMlhGQ89eRmvpIUGfKWNVdbhSbkQaWhEoMGmGslA==}
     engines: {node: '>= 12.0.0'}
     cpu: [x64]
     os: [freebsd]
@@ -1601,8 +1652,21 @@ packages:
     cpu: [arm]
     os: [linux]
 
+  lightningcss-linux-arm-gnueabihf@1.30.2:
+    resolution: {integrity: sha512-eVdpxh4wYcm0PofJIZVuYuLiqBIakQ9uFZmipf6LF/HRj5Bgm0eb3qL/mr1smyXIS1twwOxNWndd8z0E374hiA==}
+    engines: {node: '>= 12.0.0'}
+    cpu: [arm]
+    os: [linux]
+
   lightningcss-linux-arm64-gnu@1.30.1:
     resolution: {integrity: sha512-gB72maP8rmrKsnKYy8XUuXi/4OctJiuQjcuqWNlJQ6jZiWqtPvqFziskH3hnajfvKB27ynbVCucKSm2rkQp4Bw==}
+    engines: {node: '>= 12.0.0'}
+    cpu: [arm64]
+    os: [linux]
+    libc: [glibc]
+
+  lightningcss-linux-arm64-gnu@1.30.2:
+    resolution: {integrity: sha512-UK65WJAbwIJbiBFXpxrbTNArtfuznvxAJw4Q2ZGlU8kPeDIWEX1dg3rn2veBVUylA2Ezg89ktszWbaQnxD/e3A==}
     engines: {node: '>= 12.0.0'}
     cpu: [arm64]
     os: [linux]
@@ -1615,8 +1679,22 @@ packages:
     os: [linux]
     libc: [musl]
 
+  lightningcss-linux-arm64-musl@1.30.2:
+    resolution: {integrity: sha512-5Vh9dGeblpTxWHpOx8iauV02popZDsCYMPIgiuw97OJ5uaDsL86cnqSFs5LZkG3ghHoX5isLgWzMs+eD1YzrnA==}
+    engines: {node: '>= 12.0.0'}
+    cpu: [arm64]
+    os: [linux]
+    libc: [musl]
+
   lightningcss-linux-x64-gnu@1.30.1:
     resolution: {integrity: sha512-piWx3z4wN8J8z3+O5kO74+yr6ze/dKmPnI7vLqfSqI8bccaTGY5xiSGVIJBDd5K5BHlvVLpUB3S2YCfelyJ1bw==}
+    engines: {node: '>= 12.0.0'}
+    cpu: [x64]
+    os: [linux]
+    libc: [glibc]
+
+  lightningcss-linux-x64-gnu@1.30.2:
+    resolution: {integrity: sha512-Cfd46gdmj1vQ+lR6VRTTadNHu6ALuw2pKR9lYq4FnhvgBc4zWY1EtZcAc6EffShbb1MFrIPfLDXD6Xprbnni4w==}
     engines: {node: '>= 12.0.0'}
     cpu: [x64]
     os: [linux]
@@ -1629,8 +1707,21 @@ packages:
     os: [linux]
     libc: [musl]
 
+  lightningcss-linux-x64-musl@1.30.2:
+    resolution: {integrity: sha512-XJaLUUFXb6/QG2lGIW6aIk6jKdtjtcffUT0NKvIqhSBY3hh9Ch+1LCeH80dR9q9LBjG3ewbDjnumefsLsP6aiA==}
+    engines: {node: '>= 12.0.0'}
+    cpu: [x64]
+    os: [linux]
+    libc: [musl]
+
   lightningcss-win32-arm64-msvc@1.30.1:
     resolution: {integrity: sha512-mSL4rqPi4iXq5YVqzSsJgMVFENoa4nGTT/GjO2c0Yl9OuQfPsIfncvLrEW6RbbB24WtZ3xP/2CCmI3tNkNV4oA==}
+    engines: {node: '>= 12.0.0'}
+    cpu: [arm64]
+    os: [win32]
+
+  lightningcss-win32-arm64-msvc@1.30.2:
+    resolution: {integrity: sha512-FZn+vaj7zLv//D/192WFFVA0RgHawIcHqLX9xuWiQt7P0PtdFEVaxgF9rjM/IRYHQXNnk61/H/gb2Ei+kUQ4xQ==}
     engines: {node: '>= 12.0.0'}
     cpu: [arm64]
     os: [win32]
@@ -1641,8 +1732,18 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  lightningcss-win32-x64-msvc@1.30.2:
+    resolution: {integrity: sha512-5g1yc73p+iAkid5phb4oVFMB45417DkRevRbt/El/gKXJk4jid+vPFF/AXbxn05Aky8PapwzZrdJShv5C0avjw==}
+    engines: {node: '>= 12.0.0'}
+    cpu: [x64]
+    os: [win32]
+
   lightningcss@1.30.1:
     resolution: {integrity: sha512-xi6IyHML+c9+Q3W0S4fCQJOym42pyurFiJUHEcEyHS0CeKzia4yZDEsLlqOFykxOdHpNy0NmvVO31vcSqAxJCg==}
+    engines: {node: '>= 12.0.0'}
+
+  lightningcss@1.30.2:
+    resolution: {integrity: sha512-utfs7Pr5uJyyvDETitgsaqSyjCb2qNRAtuqUeWIAKztsOYdcACf2KtARYXg2pSvhkt+9NfoaNY7fxjl6nuMjIQ==}
     engines: {node: '>= 12.0.0'}
 
   lodash.camelcase@4.3.0:
@@ -2605,6 +2706,25 @@ snapshots:
   '@js-sdsl/ordered-map@4.4.2':
     optional: true
 
+  '@langchain/core@1.0.3(openai@6.7.0(zod@3.25.76))':
+    dependencies:
+      '@cfworker/json-schema': 4.1.1
+      ansi-styles: 5.2.0
+      camelcase: 6.3.0
+      decamelize: 1.2.0
+      js-tiktoken: 1.0.21
+      langsmith: 0.3.78(openai@6.7.0(zod@3.25.76))
+      mustache: 4.2.0
+      p-queue: 6.6.2
+      p-retry: 4.6.2
+      uuid: 10.0.0
+      zod: 4.1.12
+    transitivePeerDependencies:
+      - '@opentelemetry/api'
+      - '@opentelemetry/exporter-trace-otlp-proto'
+      - '@opentelemetry/sdk-trace-base'
+      - openai
+
   '@langchain/core@1.0.3(openai@6.7.0(zod@4.1.12))':
     dependencies:
       '@cfworker/json-schema': 4.1.1
@@ -2646,16 +2766,25 @@ snapshots:
       - supports-color
     optional: true
 
-  '@langchain/langgraph-checkpoint-sqlite@1.0.0(@langchain/core@1.0.3(openai@6.7.0(zod@4.1.12)))(@langchain/langgraph-checkpoint@1.0.0(@langchain/core@1.0.3(openai@6.7.0(zod@4.1.12))))':
+  '@langchain/langgraph-checkpoint@1.0.0(@langchain/core@1.0.3(openai@6.7.0(zod@3.25.76)))':
     dependencies:
-      '@langchain/core': 1.0.3(openai@6.7.0(zod@4.1.12))
-      '@langchain/langgraph-checkpoint': 1.0.0(@langchain/core@1.0.3(openai@6.7.0(zod@4.1.12)))
-      better-sqlite3: 11.10.0
+      '@langchain/core': 1.0.3(openai@6.7.0(zod@3.25.76))
+      uuid: 10.0.0
 
   '@langchain/langgraph-checkpoint@1.0.0(@langchain/core@1.0.3(openai@6.7.0(zod@4.1.12)))':
     dependencies:
       '@langchain/core': 1.0.3(openai@6.7.0(zod@4.1.12))
       uuid: 10.0.0
+
+  '@langchain/langgraph-sdk@1.0.0(@langchain/core@1.0.3(openai@6.7.0(zod@3.25.76)))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+    dependencies:
+      p-queue: 6.6.2
+      p-retry: 4.6.2
+      uuid: 9.0.1
+    optionalDependencies:
+      '@langchain/core': 1.0.3(openai@6.7.0(zod@3.25.76))
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
 
   '@langchain/langgraph-sdk@1.0.0(@langchain/core@1.0.3(openai@6.7.0(zod@4.1.12)))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
@@ -2672,6 +2801,19 @@ snapshots:
       '@langchain/core': 1.0.3(openai@6.7.0(zod@4.1.12))
       '@langchain/langgraph': 1.0.1(@langchain/core@1.0.3(openai@6.7.0(zod@4.1.12)))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(zod-to-json-schema@3.24.6(zod@4.1.12))(zod@4.1.12)
       zod: 3.25.76
+
+  '@langchain/langgraph@1.0.1(@langchain/core@1.0.3(openai@6.7.0(zod@3.25.76)))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(zod-to-json-schema@3.24.6(zod@3.25.76))(zod@3.25.76)':
+    dependencies:
+      '@langchain/core': 1.0.3(openai@6.7.0(zod@3.25.76))
+      '@langchain/langgraph-checkpoint': 1.0.0(@langchain/core@1.0.3(openai@6.7.0(zod@3.25.76)))
+      '@langchain/langgraph-sdk': 1.0.0(@langchain/core@1.0.3(openai@6.7.0(zod@3.25.76)))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      uuid: 10.0.0
+      zod: 3.25.76
+    optionalDependencies:
+      zod-to-json-schema: 3.24.6(zod@3.25.76)
+    transitivePeerDependencies:
+      - react
+      - react-dom
 
   '@langchain/langgraph@1.0.1(@langchain/core@1.0.3(openai@6.7.0(zod@4.1.12)))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(zod-to-json-schema@3.24.6(zod@4.1.12))(zod@3.25.76)':
     dependencies:
@@ -2699,10 +2841,10 @@ snapshots:
       - react
       - react-dom
 
-  '@langchain/mcp-adapters@1.0.0(@langchain/core@1.0.3(openai@6.7.0(zod@4.1.12)))(@langchain/langgraph@1.0.1(@langchain/core@1.0.3(openai@6.7.0(zod@4.1.12)))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(zod-to-json-schema@3.24.6(zod@4.1.12))(zod@4.1.12))':
+  '@langchain/mcp-adapters@1.0.0(@langchain/core@1.0.3(openai@6.7.0(zod@3.25.76)))(@langchain/langgraph@1.0.1(@langchain/core@1.0.3(openai@6.7.0(zod@3.25.76)))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(zod-to-json-schema@3.24.6(zod@3.25.76))(zod@3.25.76))':
     dependencies:
-      '@langchain/core': 1.0.3(openai@6.7.0(zod@4.1.12))
-      '@langchain/langgraph': 1.0.1(@langchain/core@1.0.3(openai@6.7.0(zod@4.1.12)))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(zod-to-json-schema@3.24.6(zod@4.1.12))(zod@4.1.12)
+      '@langchain/core': 1.0.3(openai@6.7.0(zod@3.25.76))
+      '@langchain/langgraph': 1.0.1(@langchain/core@1.0.3(openai@6.7.0(zod@3.25.76)))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(zod-to-json-schema@3.24.6(zod@3.25.76))(zod@3.25.76)
       '@modelcontextprotocol/sdk': 1.18.2
       debug: 4.4.3
       zod: 4.1.12
@@ -2710,6 +2852,15 @@ snapshots:
       extended-eventsource: 1.7.0
     transitivePeerDependencies:
       - supports-color
+
+  '@langchain/openai@1.0.0(@langchain/core@1.0.3(openai@6.7.0(zod@3.25.76)))':
+    dependencies:
+      '@langchain/core': 1.0.3(openai@6.7.0(zod@3.25.76))
+      js-tiktoken: 1.0.21
+      openai: 6.7.0(zod@4.1.12)
+      zod: 4.1.12
+    transitivePeerDependencies:
+      - ws
 
   '@langchain/openai@1.0.0(@langchain/core@1.0.3(openai@6.7.0(zod@4.1.12)))':
     dependencies:
@@ -2720,9 +2871,9 @@ snapshots:
     transitivePeerDependencies:
       - ws
 
-  '@langchain/tavily@1.0.0(@langchain/core@1.0.3(openai@6.7.0(zod@4.1.12)))':
+  '@langchain/tavily@1.0.0(@langchain/core@1.0.3(openai@6.7.0(zod@3.25.76)))':
     dependencies:
-      '@langchain/core': 1.0.3(openai@6.7.0(zod@4.1.12))
+      '@langchain/core': 1.0.3(openai@6.7.0(zod@3.25.76))
       zod: 4.1.12
 
   '@langgraph-js/pro@2.0.0(openai@6.7.0(zod@4.1.12))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(zod-to-json-schema@3.24.6(zod@4.1.12))':
@@ -2757,6 +2908,10 @@ snapshots:
     transitivePeerDependencies:
       - '@langchain/core'
       - react-dom
+
+  '@meck93/kysely-bun-sqlite@0.2.0(kysely@0.28.8)':
+    dependencies:
+      kysely: 0.28.8
 
   '@modelcontextprotocol/sdk@1.18.2':
     dependencies:
@@ -3214,11 +3369,6 @@ snapshots:
       tweetnacl: 0.14.5
     optional: true
 
-  better-sqlite3@11.10.0:
-    dependencies:
-      bindings: 1.5.0
-      prebuild-install: 7.1.3
-
   better-sqlite3@12.4.1:
     dependencies:
       bindings: 1.5.0
@@ -3228,12 +3378,14 @@ snapshots:
   bindings@1.5.0:
     dependencies:
       file-uri-to-path: 1.0.0
+    optional: true
 
   bl@4.1.0:
     dependencies:
       buffer: 5.7.1
       inherits: 2.0.4
       readable-stream: 3.6.2
+    optional: true
 
   body-parser@2.2.0:
     dependencies:
@@ -3261,6 +3413,7 @@ snapshots:
     dependencies:
       base64-js: 1.5.1
       ieee754: 1.2.1
+    optional: true
 
   buffer@6.0.3:
     dependencies:
@@ -3270,6 +3423,11 @@ snapshots:
 
   buildcheck@0.0.6:
     optional: true
+
+  bun-types@1.3.2(@types/react@19.1.16):
+    dependencies:
+      '@types/node': 22.18.6
+      '@types/react': 19.1.16
 
   byline@5.0.0:
     optional: true
@@ -3304,7 +3462,8 @@ snapshots:
       ansi-styles: 4.3.0
       supports-color: 7.2.0
 
-  chownr@1.1.4: {}
+  chownr@1.1.4:
+    optional: true
 
   chownr@3.0.0: {}
 
@@ -3389,8 +3548,10 @@ snapshots:
   decompress-response@6.0.0:
     dependencies:
       mimic-response: 3.1.0
+    optional: true
 
-  deep-extend@0.6.0: {}
+  deep-extend@0.6.0:
+    optional: true
 
   depd@2.0.0: {}
 
@@ -3446,6 +3607,7 @@ snapshots:
   end-of-stream@1.4.5:
     dependencies:
       once: 1.4.0
+    optional: true
 
   enhanced-resolve@5.18.3:
     dependencies:
@@ -3517,7 +3679,8 @@ snapshots:
     dependencies:
       eventsource-parser: 3.0.6
 
-  expand-template@2.0.3: {}
+  expand-template@2.0.3:
+    optional: true
 
   express-rate-limit@7.5.1(express@5.1.0):
     dependencies:
@@ -3569,7 +3732,8 @@ snapshots:
     optionalDependencies:
       picomatch: 4.0.3
 
-  file-uri-to-path@1.0.0: {}
+  file-uri-to-path@1.0.0:
+    optional: true
 
   finalhandler@2.1.0:
     dependencies:
@@ -3592,7 +3756,8 @@ snapshots:
 
   fresh@2.0.0: {}
 
-  fs-constants@1.0.0: {}
+  fs-constants@1.0.0:
+    optional: true
 
   fsevents@2.3.3:
     optional: true
@@ -3626,7 +3791,8 @@ snapshots:
       dunder-proto: 1.0.1
       es-object-atoms: 1.1.1
 
-  github-from-package@0.0.0: {}
+  github-from-package@0.0.0:
+    optional: true
 
   glob@10.4.5:
     dependencies:
@@ -3669,11 +3835,13 @@ snapshots:
     dependencies:
       safer-buffer: 2.1.2
 
-  ieee754@1.2.1: {}
+  ieee754@1.2.1:
+    optional: true
 
   inherits@2.0.4: {}
 
-  ini@1.3.8: {}
+  ini@1.3.8:
+    optional: true
 
   ipaddr.js@1.9.1: {}
 
@@ -3699,6 +3867,9 @@ snapshots:
 
   jiti@2.6.0: {}
 
+  jiti@2.6.1:
+    optional: true
+
   js-tiktoken@1.0.21:
     dependencies:
       base64-js: 1.5.1
@@ -3706,6 +3877,25 @@ snapshots:
   json-schema-traverse@0.4.1: {}
 
   jsonrepair@3.13.1: {}
+
+  kysely-bun-sqlite@0.3.2(@types/react@19.1.16)(kysely@0.28.8):
+    dependencies:
+      bun-types: 1.3.2(@types/react@19.1.16)
+      kysely: 0.28.8
+    transitivePeerDependencies:
+      - '@types/react'
+
+  kysely-bun-worker@1.2.1(bun-types@1.3.2(@types/react@19.1.16))(kysely@0.28.8):
+    dependencies:
+      bun-types: 1.3.2(@types/react@19.1.16)
+      kysely: 0.28.8
+      kysely-generic-sqlite: 1.2.1(kysely@0.28.8)
+    optional: true
+
+  kysely-generic-sqlite@1.2.1(kysely@0.28.8):
+    dependencies:
+      kysely: 0.28.8
+    optional: true
 
   kysely@0.28.8: {}
 
@@ -3726,6 +3916,18 @@ snapshots:
       - react-dom
       - zod-to-json-schema
 
+  langsmith@0.3.78(openai@6.7.0(zod@3.25.76)):
+    dependencies:
+      '@types/uuid': 10.0.0
+      chalk: 4.1.2
+      console-table-printer: 2.14.6
+      p-queue: 6.6.2
+      p-retry: 4.6.2
+      semver: 7.7.2
+      uuid: 10.0.0
+    optionalDependencies:
+      openai: 6.7.0(zod@3.25.76)
+
   langsmith@0.3.78(openai@6.7.0(zod@4.1.12)):
     dependencies:
       '@types/uuid': 10.0.0
@@ -3743,34 +3945,67 @@ snapshots:
       readable-stream: 2.3.8
     optional: true
 
+  lightningcss-android-arm64@1.30.2:
+    optional: true
+
   lightningcss-darwin-arm64@1.30.1:
+    optional: true
+
+  lightningcss-darwin-arm64@1.30.2:
     optional: true
 
   lightningcss-darwin-x64@1.30.1:
     optional: true
 
+  lightningcss-darwin-x64@1.30.2:
+    optional: true
+
   lightningcss-freebsd-x64@1.30.1:
+    optional: true
+
+  lightningcss-freebsd-x64@1.30.2:
     optional: true
 
   lightningcss-linux-arm-gnueabihf@1.30.1:
     optional: true
 
+  lightningcss-linux-arm-gnueabihf@1.30.2:
+    optional: true
+
   lightningcss-linux-arm64-gnu@1.30.1:
+    optional: true
+
+  lightningcss-linux-arm64-gnu@1.30.2:
     optional: true
 
   lightningcss-linux-arm64-musl@1.30.1:
     optional: true
 
+  lightningcss-linux-arm64-musl@1.30.2:
+    optional: true
+
   lightningcss-linux-x64-gnu@1.30.1:
+    optional: true
+
+  lightningcss-linux-x64-gnu@1.30.2:
     optional: true
 
   lightningcss-linux-x64-musl@1.30.1:
     optional: true
 
+  lightningcss-linux-x64-musl@1.30.2:
+    optional: true
+
   lightningcss-win32-arm64-msvc@1.30.1:
     optional: true
 
+  lightningcss-win32-arm64-msvc@1.30.2:
+    optional: true
+
   lightningcss-win32-x64-msvc@1.30.1:
+    optional: true
+
+  lightningcss-win32-x64-msvc@1.30.2:
     optional: true
 
   lightningcss@1.30.1:
@@ -3787,6 +4022,23 @@ snapshots:
       lightningcss-linux-x64-musl: 1.30.1
       lightningcss-win32-arm64-msvc: 1.30.1
       lightningcss-win32-x64-msvc: 1.30.1
+
+  lightningcss@1.30.2:
+    dependencies:
+      detect-libc: 2.1.1
+    optionalDependencies:
+      lightningcss-android-arm64: 1.30.2
+      lightningcss-darwin-arm64: 1.30.2
+      lightningcss-darwin-x64: 1.30.2
+      lightningcss-freebsd-x64: 1.30.2
+      lightningcss-linux-arm-gnueabihf: 1.30.2
+      lightningcss-linux-arm64-gnu: 1.30.2
+      lightningcss-linux-arm64-musl: 1.30.2
+      lightningcss-linux-x64-gnu: 1.30.2
+      lightningcss-linux-x64-musl: 1.30.2
+      lightningcss-win32-arm64-msvc: 1.30.2
+      lightningcss-win32-x64-msvc: 1.30.2
+    optional: true
 
   lodash.camelcase@4.3.0:
     optional: true
@@ -3818,7 +4070,8 @@ snapshots:
     dependencies:
       mime-db: 1.54.0
 
-  mimic-response@3.1.0: {}
+  mimic-response@3.1.0:
+    optional: true
 
   minimatch@5.1.6:
     dependencies:
@@ -3830,7 +4083,8 @@ snapshots:
       brace-expansion: 2.0.2
     optional: true
 
-  minimist@1.2.8: {}
+  minimist@1.2.8:
+    optional: true
 
   minipass@7.1.2: {}
 
@@ -3838,7 +4092,8 @@ snapshots:
     dependencies:
       minipass: 7.1.2
 
-  mkdirp-classic@0.5.3: {}
+  mkdirp-classic@0.5.3:
+    optional: true
 
   mkdirp@1.0.4:
     optional: true
@@ -3854,7 +4109,8 @@ snapshots:
 
   nanostores@1.0.1: {}
 
-  napi-build-utils@2.0.0: {}
+  napi-build-utils@2.0.0:
+    optional: true
 
   negotiator@1.0.0: {}
 
@@ -3884,6 +4140,7 @@ snapshots:
   node-abi@3.77.0:
     dependencies:
       semver: 7.7.2
+    optional: true
 
   normalize-path@3.0.0:
     optional: true
@@ -3899,6 +4156,11 @@ snapshots:
   once@1.4.0:
     dependencies:
       wrappy: 1.0.2
+
+  openai@6.7.0(zod@3.25.76):
+    optionalDependencies:
+      zod: 3.25.76
+    optional: true
 
   openai@6.7.0(zod@4.1.12):
     optionalDependencies:
@@ -4016,6 +4278,7 @@ snapshots:
       simple-get: 4.0.1
       tar-fs: 2.1.4
       tunnel-agent: 0.6.0
+    optional: true
 
   process-nextick-args@2.0.1:
     optional: true
@@ -4060,6 +4323,7 @@ snapshots:
     dependencies:
       end-of-stream: 1.4.5
       once: 1.4.0
+    optional: true
 
   punycode@2.3.1: {}
 
@@ -4084,6 +4348,7 @@ snapshots:
       ini: 1.3.8
       minimist: 1.2.8
       strip-json-comments: 2.0.1
+    optional: true
 
   react-dom@19.1.0(react@19.1.0):
     dependencies:
@@ -4108,6 +4373,7 @@ snapshots:
       inherits: 2.0.4
       string_decoder: 1.3.0
       util-deprecate: 1.0.2
+    optional: true
 
   readable-stream@4.7.0:
     dependencies:
@@ -4300,13 +4566,15 @@ snapshots:
   signal-exit@4.1.0:
     optional: true
 
-  simple-concat@1.0.1: {}
+  simple-concat@1.0.1:
+    optional: true
 
   simple-get@4.0.1:
     dependencies:
       decompress-response: 6.0.0
       once: 1.4.0
       simple-concat: 1.0.1
+    optional: true
 
   simple-wcswidth@1.1.2: {}
 
@@ -4368,6 +4636,7 @@ snapshots:
   string_decoder@1.3.0:
     dependencies:
       safe-buffer: 5.2.1
+    optional: true
 
   strip-ansi@6.0.1:
     dependencies:
@@ -4379,7 +4648,8 @@ snapshots:
       ansi-regex: 6.2.2
     optional: true
 
-  strip-json-comments@2.0.1: {}
+  strip-json-comments@2.0.1:
+    optional: true
 
   styled-jsx@5.1.6(react@19.1.0):
     dependencies:
@@ -4400,6 +4670,7 @@ snapshots:
       mkdirp-classic: 0.5.3
       pump: 3.0.3
       tar-stream: 2.2.0
+    optional: true
 
   tar-fs@3.1.1:
     dependencies:
@@ -4420,6 +4691,7 @@ snapshots:
       fs-constants: 1.0.0
       inherits: 2.0.4
       readable-stream: 3.6.2
+    optional: true
 
   tar-stream@3.1.7:
     dependencies:
@@ -4485,6 +4757,7 @@ snapshots:
   tunnel-agent@0.6.0:
     dependencies:
       safe-buffer: 5.2.1
+    optional: true
 
   tweetnacl@0.14.5:
     optional: true
@@ -4518,7 +4791,8 @@ snapshots:
     dependencies:
       punycode: 2.3.1
 
-  util-deprecate@1.0.2: {}
+  util-deprecate@1.0.2:
+    optional: true
 
   uuid@10.0.0: {}
 
@@ -4526,7 +4800,7 @@ snapshots:
 
   vary@1.1.2: {}
 
-  vite@7.1.12(@types/node@22.18.6)(jiti@2.6.0)(lightningcss@1.30.1)(yaml@2.8.1):
+  vite@7.1.12(@types/node@22.18.6)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.8.1):
     dependencies:
       esbuild: 0.25.10
       fdir: 6.5.0(picomatch@4.0.3)
@@ -4537,8 +4811,8 @@ snapshots:
     optionalDependencies:
       '@types/node': 22.18.6
       fsevents: 2.3.3
-      jiti: 2.6.0
-      lightningcss: 1.30.1
+      jiti: 2.6.1
+      lightningcss: 1.30.2
       yaml: 2.8.1
 
   which@2.0.2:

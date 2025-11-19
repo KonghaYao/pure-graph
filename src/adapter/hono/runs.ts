@@ -24,7 +24,7 @@ import camelcaseKeys from 'camelcase-keys';
  */
 function withHeartbeat(
     streamFn: (stream: SSEStreamingApi) => Promise<void>,
-    heartbeatInterval: number = 3000,
+    heartbeatInterval: number = process.env.HEARTBEAT_INTERVAL ? parseInt(process.env.HEARTBEAT_INTERVAL) : 1500,
 ): (stream: SSEStreamingApi) => Promise<void> {
     return async (stream: SSEStreamingApi) => {
         let heartbeatTimer: NodeJS.Timeout | null = null;
