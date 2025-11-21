@@ -235,7 +235,10 @@ CREATE TABLE IF NOT EXISTS writes (
             }),
         );
 
-        const checkpoint = (await this.serde.loadsTyped(row.type ?? 'json', row.checkpoint.toString())) as Checkpoint;
+        const checkpoint = (await this.serde.loadsTyped(
+            row.type ?? 'json',
+            new TextDecoder().decode(row.checkpoint),
+        )) as Checkpoint;
 
         if (checkpoint.v < 4 && row.parent_checkpoint_id != null) {
             await this.migratePendingSends(checkpoint, row.thread_id, row.parent_checkpoint_id);
@@ -244,7 +247,10 @@ CREATE TABLE IF NOT EXISTS writes (
         return {
             checkpoint,
             config: finalConfig,
-            metadata: (await this.serde.loadsTyped(row.type ?? 'json', row.metadata.toString())) as CheckpointMetadata,
+            metadata: (await this.serde.loadsTyped(
+                row.type ?? 'json',
+                new TextDecoder().decode(row.metadata),
+            )) as CheckpointMetadata,
             parentConfig: row.parent_checkpoint_id
                 ? {
                       configurable: {
@@ -351,7 +357,7 @@ CREATE TABLE IF NOT EXISTS writes (
 
             const checkpoint = (await this.serde.loadsTyped(
                 row.type ?? 'json',
-                row.checkpoint.toString(),
+                new TextDecoder().decode(row.checkpoint),
             )) as Checkpoint;
 
             if (checkpoint.v < 4 && row.parent_checkpoint_id != null) {
@@ -369,7 +375,7 @@ CREATE TABLE IF NOT EXISTS writes (
                 checkpoint,
                 metadata: (await this.serde.loadsTyped(
                     row.type ?? 'json',
-                    row.metadata.toString(),
+                    new TextDecoder().decode(row.metadata),
                 )) as CheckpointMetadata,
                 parentConfig: row.parent_checkpoint_id
                     ? {
