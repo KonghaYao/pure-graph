@@ -1,8 +1,8 @@
 import { InteropZodObject } from '@langchain/core/utils/types';
 import {
     AnnotationRoot,
+    BaseCheckpointSaver,
     CompiledStateGraph,
-    MemorySaver,
     Pregel,
     StateDefinition,
     StateGraph,
@@ -16,10 +16,12 @@ export const createEntrypointGraph = <S extends InteropZodObject, C extends Inte
     stateSchema,
     config,
     graph,
+    checkpointer,
 }: {
     stateSchema: S;
     config?: C;
     graph: Pregel<any, any>;
+    checkpointer?: BaseCheckpointSaver;
 }): CompiledStateGraph<
     {},
     {},
@@ -41,5 +43,6 @@ export const createEntrypointGraph = <S extends InteropZodObject, C extends Inte
         .addEdge(name, '__end__')
         .compile({
             name,
+            checkpointer,
         });
 };

@@ -1,4 +1,0 @@
-packages:
-    # 指定根目录直接子目录中的包
-    - "packages/*"
-    - "examples/*"
