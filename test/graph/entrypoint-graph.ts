@@ -1,12 +1,13 @@
-import { MessagesZodMeta } from '@langchain/langgraph';
-import { z } from 'zod';
-import { createStateEntrypoint } from '../../src';
+import { entrypoint, MessagesZodMeta, getConfig, interrupt, MemorySaver } from '@langchain/langgraph';
+import { z } from 'zod/v3';
+import { createEntrypointGraph, LangGraphGlobal } from '../../src/';
 import { ChatOpenAI } from '@langchain/openai';
 import { BaseMessage, createAgent, humanInTheLoopMiddleware, tool } from 'langchain';
 import { withLangGraph } from '@langchain/langgraph/zod';
+import { create_artifacts } from './create_artifacts';
 
 const State = z.object({
-    messages: withLangGraph(z.custom<BaseMessage[]>(), MessagesZodMeta).default([]),
+    messages: withLangGraph(z.custom<BaseMessage[]>(), MessagesZodMeta),
 });
 const show_form = tool(
     (props) => {
@@ -35,7 +36,8 @@ const interrupt_test = tool(
     },
 );
 
-export const graph = createStateEntrypoint({ name: 'test-entrypoint', stateSchema: State }, async (state, config) => {
+const workflow = entrypoint('test-entrypoint', async (state: z.infer<typeof State>, config) => {
+    console.log('Context:', config);
     const agent = createAgent({
         model: new ChatOpenAI({
             model: 'gpt-4o-mini',
@@ -46,7 +48,6 @@ export const graph = createStateEntrypoint({ name: 'test-entrypoint', stateSchem
             },
         }),
         systemPrompt: '你是一个智能助手',
-        stateSchema: State,
         tools: [show_form, interrupt_test],
         middleware: [
             humanInTheLoopMiddleware({
@@ -56,6 +57,10 @@ export const graph = createStateEntrypoint({ name: 'test-entrypoint', stateSchem
             }),
         ],
     });
-    const newState = await agent.invoke(state);
-    return newState;
+    return agent.invoke(state);
+});
+
+export const graph = createEntrypointGraph({
+    stateSchema: State,
+    graph: workflow,
 });
