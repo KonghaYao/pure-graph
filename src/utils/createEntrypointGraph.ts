@@ -1,25 +1,15 @@
 import { InteropZodObject } from '@langchain/core/utils/types';
-import {
-    AnnotationRoot,
-    CompiledStateGraph,
-    MemorySaver,
-    Pregel,
-    StateDefinition,
-    StateGraph,
-    StateType,
-    UpdateType,
-} from '@langchain/langgraph';
-import { InteropZodToStateDefinition } from '@langchain/langgraph/zod';
-import { ZodObject, ZodSchema, ZodTypeAny } from 'zod';
-
+import { BaseCheckpointSaver, CompiledStateGraph, Pregel, StateDefinition, StateGraph } from '@langchain/langgraph';
 export const createEntrypointGraph = <S extends InteropZodObject, C extends InteropZodObject>({
     stateSchema,
     config,
     graph,
+    checkpointer,
 }: {
     stateSchema: S;
     config?: C;
     graph: Pregel<any, any>;
+    checkpointer?: BaseCheckpointSaver;
 }): CompiledStateGraph<
     {},
     {},
@@ -41,5 +31,6 @@ export const createEntrypointGraph = <S extends InteropZodObject, C extends Inte
         .addEdge(name, '__end__')
         .compile({
             name,
+            checkpointer,
         });
 };

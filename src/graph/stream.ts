@@ -102,10 +102,17 @@ export async function streamStateWithQueue(
             if (event[0] === 'values') {
                 const value = event[1];
                 await queue.push(new EventMessage(getNameWithNs('values'), value));
-                if (getNameWithNs('values') === 'values')
-                    await threads.set(run.thread_id, {
-                        values: value ? JSON.parse(serialiseAsDict(value)) : '',
-                    });
+                if (getNameWithNs('values') === 'values') {
+                    if (value?.__interrupt__) {
+                        await threads.set(run.thread_id, {
+                            interrupts: value ? JSON.parse(serialiseAsDict(value)) : '',
+                        });
+                    } else {
+                        await threads.set(run.thread_id, {
+                            values: value ? JSON.parse(serialiseAsDict(value)) : '',
+                        });
+                    }
+                }
             } else if (event[0] === 'messages') {
                 const message = event[1][0];
                 const metadata = event[1][1];

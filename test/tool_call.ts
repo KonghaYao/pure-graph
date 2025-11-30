@@ -1,5 +1,5 @@
 import { HumanMessage } from 'langchain';
-import { graph } from './graph/entrypoint';
+import { graph } from './graph/tool_call';
 
 for await (const event of await graph.stream(
     {

@@ -1,4 +1,3 @@
-packages:
-    # 指定根目录直接子目录中的包
-    - "packages/*"
-    - "examples/*"
+onlyBuiltDependencies:
+  - better-sqlite3
+  - esbuild
