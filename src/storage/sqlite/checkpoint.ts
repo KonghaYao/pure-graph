@@ -102,16 +102,20 @@ export class SqliteSaver extends BaseCheckpointSaver {
     static async fromConnStringAsync(connStringOrLocalPath: string): Promise<SqliteSaver> {
         let saver: SqliteSaver;
         /** @ts-ignore */
-        if (globalThis.Bun) {
+        if (!globalThis.Bun) {
             console.log('LG | Using BunWorkerDialect ' + connStringOrLocalPath);
             const { BunWorkerDialect } = await import('kysely-bun-worker');
             saver = new SqliteSaver(new BunWorkerDialect({ url: connStringOrLocalPath }));
         } else {
             /** @ts-ignore */
-            const { default: Database } = await import('better-sqlite3');
-            console.log('LG | Using BetterSQLite3Dialect');
-            const database = new Database(connStringOrLocalPath);
-            saver = new SqliteSaver(new SqliteDialect({ database }));
+            console.log('LG | Using NodeWasmDialect');
+            const { default: SqliteDatabase } = await import('node-sqlite3-wasm');
+            const { NodeWasmDialect } = await import('kysely-wasm');
+            console.log(connStringOrLocalPath);
+            const wasm = new NodeWasmDialect({
+                database: new SqliteDatabase.Database(connStringOrLocalPath),
+            });
+            saver = new SqliteSaver(wasm);
         }
         await saver.setup();
         return saver;

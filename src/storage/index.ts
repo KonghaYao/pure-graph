@@ -39,6 +39,15 @@ export const createCheckPointer = async () => {
         const db = await SqliteSaver.fromConnStringAsync(process.env.SQLITE_DATABASE_URI);
         return db;
     }
+    console.log('LG | You are using memory as checkpoint!');
+    console.log(
+        '\x1b[33m%s\x1b[0m',
+        'LG | set SQLITE_DATABASE_URI=./.langgraph_api/langgraph.db to your .env file to use \x1b[1mSQLite\x1b[0m for dev!',
+    );
+    console.log(
+        '\x1b[33m%s\x1b[0m',
+        'LG | set DATABASE_URL=postgresql://user:pass@localhost:5432/db to your .env file to use \x1b[1mPostgreSQL\x1b[0m for prod!',
+    );
     return new MemorySaver();
 };
 

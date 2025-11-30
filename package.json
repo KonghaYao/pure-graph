@@ -57,12 +57,13 @@
         "zod": "^4"
     },
     "optionalDependencies": {
+        "kysely-wasm": "^1.2.1",
         "@hono/zod-validator": "^0.7.3",
         "@langchain/langgraph-checkpoint-postgres": "^1.0.0",
         "@langchain/langgraph-checkpoint-redis": "^1.0.0",
-        "kysely-bun-worker": "^1.2.1",
-        "better-sqlite3": "^12",
         "hono": "^4.9.9",
+        "kysely-bun-worker": "^1.2.1",
+        "node-sqlite3-wasm": "^0.8.51",
         "pg": "^8.16.3",
         "redis": "^5.8.3"
     },
