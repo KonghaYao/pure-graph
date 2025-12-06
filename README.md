@@ -20,7 +20,9 @@ This document will guide you on how to use Open LangGraph Server in your project
 -   **Multiple Storage Backends**: Support for SQLite, PostgreSQL, Redis, and in-memory storage
 -   **Message Queue**: Redis-based stream queue with TTL support
 -   **Thread Management**: Comprehensive thread lifecycle management with status tracking
--   **Framework Integration**: Native support for Next.js and Hono.js frameworks
+-   **Framework Agnostic**: Core implementation uses standard Web APIs (Request/Response)
+-   **Framework Integration**: Native support for Next.js, Hono.js, and any platform supporting standard fetch handlers
+-   **Easy Migration**: All adapters use the same core implementation, making it easy to switch platforms
 
 ## Installation
 
@@ -37,6 +39,60 @@ yarn add @langgraph-js/pure-graph
 ```
 
 ## Usage
+
+### Architecture
+
+Open LangGraph Server uses a layered architecture:
+
+```
+┌─────────────────────────────────────────┐
+│   Framework Adapters (Hono, Next.js)   │  ← Thin wrapper layer
+├─────────────────────────────────────────┤
+│   Fetch Handler (Standard Web APIs)     │  ← Core implementation
+├─────────────────────────────────────────┤
+│   LangGraph Core Logic                  │  ← Graph execution
+└─────────────────────────────────────────┘
+```
+
+All framework adapters (Hono, Next.js) use the same core `fetch` implementation, which is based on standard Web APIs (`Request`/`Response`). This means:
+
+-   **Easy Migration**: Switch between platforms without rewriting API logic
+-   **Platform Agnostic**: Works on any platform supporting standard fetch handlers (Cloudflare Workers, Deno Deploy, Vercel Edge, etc.)
+-   **Single Source of Truth**: All adapters share the same behavior and bug fixes
+
+### Standard Fetch Handler
+
+For platforms supporting standard `(req: Request, context?: any) => Response` handlers:
+
+```ts
+import { handleRequest } from '@langgraph-js/pure-graph/dist/adapter/fetch';
+import { registerGraph } from '@langgraph-js/pure-graph';
+import { graph } from './agent/graph';
+
+// Register your graph
+registerGraph('my-graph', graph);
+
+// Use the handler
+export default async function handler(req: Request) {
+    // Optional: Add custom context
+    const context = {
+        langgraph_context: {
+            userId: req.headers.get('x-user-id'),
+            // ... other context data
+        },
+    };
+
+    return await handleRequest(req, context);
+}
+```
+
+This works on:
+
+-   **Cloudflare Workers**
+-   **Deno Deploy**
+-   **Vercel Edge Functions**
+-   **Bun**
+-   Any platform with standard Web APIs
 
 ### Next.js Example
 
@@ -127,15 +183,27 @@ To integrate Open LangGraph Server into a Hono.js project, follow these steps:
     import { Hono } from 'hono';
     import LangGraphApp, { type LangGraphServerContext } from '@langgraph-js/pure-graph/dist/adapter/hono/index';
     import { cors } from 'hono/cors';
+
     registerGraph('test', graph);
 
     const app = new Hono<{ Variables: LangGraphServerContext }>();
-    app.use(cors())
-    app.route('/', LangGraphApp);
 
+    // Optional: Add context middleware
+    app.use('/api/*', async (c, next) => {
+        c.set('langgraph_context', {
+            userId: c.req.header('x-user-id'),
+            // ... other context data
+        });
+        await next();
+    });
+
+    app.use(cors());
+    app.route('/api', LangGraphApp);
 
     export default app;
     ```
+
+    > **Note**: The Hono adapter is a thin wrapper around the standard fetch handler. It extracts the `langgraph_context` from Hono's context and passes it to the core implementation.
 
 2. **Using LangGraph Entrypoint (Recommended)**
 
@@ -335,15 +403,35 @@ export const config = {
 
 ```ts
 // app/api/langgraph/[...path]/route.ts
-import { GET, POST, DELETE } from '@langgraph-js/pure-graph/dist/adapter/nextjs/router';
-import { registerGraph } from '@langgraph-js/pure-graph';
-import { graph as contextAwareGraph } from '@/agent/context-aware-graph';
+import { NextRequest } from 'next/server';
+import { ensureInitialized } from '@langgraph-js/pure-graph/dist/adapter/nextjs/index';
 
-// Register your context-aware graph
-registerGraph('context-aware', contextAwareGraph);
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
-export { GET, POST, DELETE };
+const registerGraph = async () => {
+    const { registerGraph } = await import('@langgraph-js/pure-graph');
+    const { graph as contextAwareGraph } = await import('@/agent/context-aware-graph');
+    registerGraph('context-aware', contextAwareGraph);
+};
+
+export const GET = async (req: NextRequest) => {
+    const { GET } = await ensureInitialized(registerGraph);
+    return GET(req);
+};
+
+export const POST = async (req: NextRequest) => {
+    const { POST } = await ensureInitialized(registerGraph);
+    return POST(req);
+};
+
+export const DELETE = async (req: NextRequest) => {
+    const { DELETE } = await ensureInitialized(registerGraph);
+    return DELETE(req);
+};
 ```
+
+> **Note**: The Next.js adapter extracts context from the `x-langgraph-context` header and passes it to the core fetch handler.
 
 ## Environment Configuration
 
@@ -491,23 +579,103 @@ Storage backends are selected in this priority order:
 3. **SQLite** (if `SQLITE_DATABASE_URI` set)
 4. **Memory** (fallback default)
 
+## Platform Support
+
+Open LangGraph Server's fetch-based architecture makes it compatible with multiple platforms:
+
+| Platform               | Adapter                           | Status             |
+| ---------------------- | --------------------------------- | ------------------ |
+| **Next.js**            | `adapter/nextjs`                  | ✅ Fully Supported |
+| **Hono.js**            | `adapter/hono`                    | ✅ Fully Supported |
+| **Cloudflare Workers** | `adapter/fetch`                   | ✅ Fully Supported |
+| **Deno Deploy**        | `adapter/fetch`                   | ✅ Fully Supported |
+| **Vercel Edge**        | `adapter/fetch`                   | ✅ Fully Supported |
+| **Bun**                | `adapter/fetch`                   | ✅ Fully Supported |
+| **Node.js**            | `adapter/hono` or `adapter/fetch` | ✅ Fully Supported |
+
+### Platform-Specific Examples
+
+#### Cloudflare Workers
+
+```ts
+import { handleRequest } from '@langgraph-js/pure-graph/dist/adapter/fetch';
+import { registerGraph } from '@langgraph-js/pure-graph';
+import { graph } from './agent/graph';
+
+registerGraph('my-graph', graph);
+
+export default {
+    async fetch(request: Request, env: any, ctx: any) {
+        const context = {
+            langgraph_context: {
+                userId: request.headers.get('x-user-id'),
+            },
+        };
+        return await handleRequest(request, context);
+    },
+};
+```
+
+#### Deno Deploy
+
+```ts
+import { handleRequest } from '@langgraph-js/pure-graph/dist/adapter/fetch';
+import { registerGraph } from '@langgraph-js/pure-graph';
+import { graph } from './agent/graph.ts';
+
+registerGraph('my-graph', graph);
+
+Deno.serve(async (req) => {
+    const context = {
+        langgraph_context: {
+            userId: req.headers.get('x-user-id'),
+        },
+    };
+    return await handleRequest(req, context);
+});
+```
+
+#### Vercel Edge Functions
+
+```ts
+import { handleRequest } from '@langgraph-js/pure-graph/dist/adapter/fetch';
+import { registerGraph } from '@langgraph-js/pure-graph';
+import { graph } from './agent/graph';
+
+registerGraph('my-graph', graph);
+
+export const config = {
+    runtime: 'edge',
+};
+
+export default async function handler(req: Request) {
+    const context = {
+        langgraph_context: {
+            userId: req.headers.get('x-user-id'),
+        },
+    };
+    return await handleRequest(req, context);
+}
+```
+
 ## API Endpoints
 
 ### Assistants
 
--   **GET /assistants**: Search for assistants.
--   **GET /assistants/{assistantId}**: Retrieve a specific assistant graph.
+-   **POST /assistants/search**: Search for assistants.
+-   **GET /assistants/{assistantId}/graph**: Retrieve a specific assistant graph.
 
 ### Threads
 
 -   **POST /threads**: Create a new thread.
--   **GET /threads**: Search for threads.
+-   **POST /threads/search**: Search for threads.
 -   **GET /threads/{threadId}**: Retrieve a specific thread.
 -   **DELETE /threads/{threadId}**: Delete a specific thread.
+-   **POST /threads/{threadId}/state**: Update thread state.
 
 ### Runs
 
 -   **GET /threads/{threadId}/runs**: List runs in a thread.
--   **POST /threads/{threadId}/runs**: Create a new run.
--   **DELETE /threads/{threadId}/runs/{runId}**: Cancel a specific run.
--   **GET /threads/{threadId}/runs/{runId}/stream**: Stream run data.
+-   **POST /threads/{threadId}/runs/stream**: Create and stream a new run (most commonly used).
+-   **GET /threads/{threadId}/runs/{runId}/stream**: Join an existing run stream.
+-   **POST /threads/{threadId}/runs/{runId}/cancel**: Cancel a specific run.

@@ -24,7 +24,7 @@
             {
                 "title": "Framework Integration",
                 "page": "frameworks",
-                "href": "docs/frameworks/nextjs"
+                "href": "docs/frameworks/fetch"
             },
             {
                 "title": "Auth",
@@ -51,7 +51,7 @@
 
             {
                 "group": "Framework Integration",
-                "pages": ["docs/frameworks/nextjs", "docs/frameworks/hono"]
+                "pages": ["docs/frameworks/fetch", "docs/frameworks/nextjs", "docs/frameworks/hono"]
             },
             {
                 "group": "Database",
