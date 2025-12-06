@@ -158,7 +158,7 @@ export async function* createStreamFromQueue(queueId: string): AsyncGenerator<{ 
     return queue.onDataReceive();
 }
 
-export const serialiseAsDict = (obj: unknown, indent = 2) => {
+export const serialiseAsDict = (obj: unknown, indent = 0) => {
     return JSON.stringify(
         obj,
         function (key: string | number, value: unknown) {

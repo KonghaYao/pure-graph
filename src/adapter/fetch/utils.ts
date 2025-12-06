@@ -107,39 +107,68 @@ export function errorResponse(error: unknown, status = 500): Response {
  */
 export function createSSEStream(streamFn: (writer: SSEWriter) => Promise<void>): Response {
     let controller: ReadableStreamDefaultController<Uint8Array>;
+    let isClosed = false;
 
     const stream = new ReadableStream<Uint8Array>({
-        start(ctrl) {
+        async start(ctrl) {
             controller = ctrl;
-        },
-        async pull() {
+            const encoder = new TextEncoder();
+
             const writer: SSEWriter = {
                 writeSSE: async ({ data, event, id }) => {
-                    const encoder = new TextEncoder();
-                    let message = '';
-
-                    if (id) {
-                        message += `id: ${id}\n`;
+                    // 检查流是否已关闭
+                    if (isClosed) {
+                        return;
                     }
-                    if (event) {
-                        message += `event: ${event}\n`;
-                    }
-                    message += `data: ${data}\n\n`;
 
-                    controller.enqueue(encoder.encode(message));
+                    try {
+                        let message = '';
+
+                        if (id) {
+                            message += `id: ${id}\n`;
+                        }
+                        if (event) {
+                            message += `event: ${event}\n`;
+                        }
+                        message += `data: ${data}\n\n`;
+
+                        controller.enqueue(encoder.encode(message));
+                    } catch (error) {
+                        // 忽略写入已关闭流的错误
+                        if (!isClosed) {
+                            throw error;
+                        }
+                    }
                 },
                 close: () => {
-                    controller.close();
+                    if (!isClosed) {
+                        isClosed = true;
+                        try {
+                            controller.close();
+                        } catch (error) {
+                            // 流可能已经关闭
+                        }
+                    }
                 },
             };
 
             try {
                 await streamFn(writer);
-                controller.close();
             } catch (error) {
                 console.error('SSE stream error:', error);
-                controller.error(error);
+            } finally {
+                if (!isClosed) {
+                    isClosed = true;
+                    try {
+                        controller.close();
+                    } catch (error) {
+                        // 流可能已经关闭
+                    }
+                }
             }
+        },
+        cancel() {
+            isClosed = true;
         },
     });
 
