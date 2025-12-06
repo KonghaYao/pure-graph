@@ -8,40 +8,76 @@ Open LangGraph Server bridges the gap between LangGraph workflows and web applic
 
 ## Core Architecture
 
-The architecture follows a layered approach that separates concerns while maintaining tight integration:
+Open LangGraph Server uses a three-layer architecture built on standard Web APIs, making it framework-agnostic and portable:
 
 ```
-┌────────────────────┐    ┌────────────────────────────┐    ┌────────────────────┐
-│   Framework        │    │    Open LangGraph Server   │    │    LangGraph       │
-│   Adapters         │◄──►│         API Layer          │◄──►│    Workflows       │
-│                    │    │                            │    │                    │
-│ • Next.js          │    │ • REST Endpoints           │    │ • StateGraphs      │
-│ • Hono.js          │    │ • Type Validation          │    │ • Agents           │
-└────────────────────┘    └────────────────────────────┘    └────────────────────┘
-                                   ▲
-                                   │
-                ┌──────────────────┼──────────────────┐
-                │                  │                  │
-        ┌───────▼────────┐   ┌─────▼────~~┐   ┌──────▼──────┐
-        │   Storage      │   │   Queue    │   │   Threads   │
-        │   Layer        │   │   Layer    │   │   Manager   │
-        │                │   │            │   │             │
-        │ • SQLite       │   │ • Redis    │   │ • Lifecycle │
-        │ • PostgreSQL   │   │ • Memory   │   │ • Status    │
-        │ • Redis        │   │            │   │ • Metadata  │
-        │ • Memory       │   │            │   │             │
-        └────────────────┘   └────────────┘   └─────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│              Framework Adapters (Thin Wrappers)                 │
+│   ┌──────────────┐  ┌──────────────┐  ┌──────────────┐        │
+│   │   Next.js    │  │   Hono.js    │  │   Others     │        │
+│   │   Adapter    │  │   Adapter    │  │   (Any)      │        │
+│   └──────────────┘  └──────────────┘  └──────────────┘        │
+└─────────────────────────────────────────────────────────────────┘
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
+│            Core Fetch Handler (Standard Web APIs)               │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │  Request Handler (req: Request) => Response              │  │
+│  │  • Route Matching  • Validation  • SSE Streaming         │  │
+│  └──────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    LangGraph Integration                        │
+│  ┌────────────┐  ┌────────────┐  ┌────────────┐              │
+│  │ Assistants │  │  Threads   │  │    Runs    │              │
+│  │    API     │  │    API     │  │    API     │              │
+│  └────────────┘  └────────────┘  └────────────┘              │
+└─────────────────────────────────────────────────────────────────┘
+                            ▼
+        ┌──────────────────┼──────────────────┐
+        │                  │                  │
+┌───────▼────────┐   ┌─────▼────────┐   ┌────▼──────┐
+│   Storage      │   │    Queue     │   │  Threads  │
+│   Backend      │   │   Backend    │   │  Manager  │
+│                │   │              │   │           │
+│ • PostgreSQL   │   │ • Redis      │   │ • Status  │
+│ • SQLite       │   │ • Memory     │   │ • State   │
+│ • Redis        │   │              │   │           │
+│ • Memory       │   │              │   │           │
+└────────────────┘   └──────────────┘   └───────────┘
 ```
 
 ## Key Components
 
-### Framework Integration Layer
+### Framework Adapters (Thin Wrappers)
 
-Provides HTTP interfaces and request handling for popular JavaScript frameworks:
+Lightweight adapters that bridge framework-specific APIs to the standard fetch handler:
 
--   **Next.js Adapter**: Leverages App Router for optimal performance and developer experience
--   **Hono.js Adapter**: Lightweight, high-performance HTTP interface with minimal overhead
--   **Context Injection**: Passes framework-specific data (authentication, sessions) to graph executions
+-   **Next.js Adapter**: Extracts context from `x-langgraph-context` header and handles Next.js initialization patterns
+-   **Hono.js Adapter**: Extracts context from Hono's `langgraph_context` variable
+-   **Standard Fetch Handler**: Core implementation works directly on any platform supporting Web APIs
+
+**All adapters share the same core implementation**, ensuring:
+-   Consistent behavior across platforms
+-   Single source of truth for API logic
+-   Easy migration between frameworks
+
+### Core Fetch Handler (Standard Web APIs)
+
+Platform-agnostic implementation using only standard `Request`/`Response` APIs:
+
+-   **Route Matching**: Regex-based routing without framework dependencies
+-   **Request Validation**: Zod-based runtime validation
+-   **SSE Streaming**: Custom SSE implementation with heartbeat support
+-   **Context Management**: Framework-agnostic context passing
+
+Works on:
+-   Cloudflare Workers
+-   Deno Deploy
+-   Vercel Edge Functions
+-   Bun
+-   Any platform with standard fetch APIs
 
 ### API Abstraction Layer
 
@@ -63,11 +99,37 @@ Flexible storage backends for different deployment scenarios:
 ## Data Flow
 
 ```
-Web Request → Framework Adapter → API Validation → Context Injection
-                                                            ↓
-LangGraph Execution → State Checkpointing → Result Streaming
-                                                            ↓
-HTTP Response ← Framework Formatting ← Queue Management ← Storage
+┌───────────────┐
+│  Web Request  │
+└───────┬───────┘
+        ▼
+┌──────────────────────┐
+│  Framework Adapter   │ ← Extract context from framework-specific sources
+│  (Next.js/Hono/etc)  │
+└──────────┬───────────┘
+           ▼
+┌──────────────────────┐
+│  Core Fetch Handler  │ ← Standard Request/Response processing
+│  • Route matching    │
+│  • Validation        │
+│  • Context injection │
+└──────────┬───────────┘
+           ▼
+┌──────────────────────┐
+│ LangGraph Execution  │ ← Graph runs with checkpoints
+└──────────┬───────────┘
+           ▼
+┌──────────────────────┐
+│  Storage & Queues    │ ← State persistence & streaming
+└──────────┬───────────┘
+           ▼
+┌──────────────────────┐
+│    SSE Streaming     │ ← Real-time results with heartbeat
+└──────────┬───────────┘
+           ▼
+┌──────────────────────┐
+│   HTTP Response      │
+└────────────────────────┘
 ```
 
 ## Configuration Philosophy
@@ -80,7 +142,29 @@ Open LangGraph Server embraces "convention over configuration" with environment-
 
 ## Design Principles
 
--   **Framework Agnostic**: Clean separation allows integration with any JavaScript framework
--   **Type Safe**: Full TypeScript support with runtime validation
+-   **Platform Agnostic**: Core implementation uses only standard Web APIs (Request/Response)
+-   **Framework Neutral**: Thin adapters make framework integration effortless
+-   **Type Safe**: Full TypeScript support with Zod runtime validation
 -   **Production Ready**: Built-in scalability, monitoring, and error handling
 -   **Developer Friendly**: Simple APIs with comprehensive documentation
+-   **Easy Migration**: Switch platforms without rewriting API logic
+
+## Why This Architecture?
+
+### Single Source of Truth
+All framework adapters use the same core implementation, meaning:
+-   Bug fixes apply everywhere instantly
+-   New features available to all platforms
+-   Consistent behavior across deployments
+
+### Maximum Portability
+Based on Web Standards (WHATWG Fetch API):
+-   Run on Cloudflare Workers, Deno Deploy, Vercel Edge
+-   No framework lock-in
+-   Future-proof as standards evolve
+
+### Minimal Overhead
+Framework adapters are just thin wrappers:
+-   Hono adapter: ~30 lines of code
+-   Next.js adapter: ~40 lines of code
+-   Direct fetch usage: 0 lines of adapter code

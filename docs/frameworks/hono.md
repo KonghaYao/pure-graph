@@ -6,6 +6,19 @@ title: Hono.js
 
 Open LangGraph Server integrates seamlessly with Hono.js applications, providing a lightweight and fast HTTP interface for your LangGraph workflows. This guide covers everything you need to set up and use Open LangGraph Server with Hono.js.
 
+## Architecture Overview
+
+The Hono adapter is a **thin wrapper** (~30 lines of code) around the core fetch handler. It extracts `langgraph_context` from Hono's context system and passes it to the standard fetch implementation.
+
+```
+Hono Request → Extract Context → Core Fetch Handler → Response
+```
+
+This means:
+-   ✅ All API logic is framework-agnostic
+-   ✅ Bug fixes apply to all platforms instantly
+-   ✅ Easy migration to other platforms if needed
+
 ## Installation
 
 Install Open LangGraph Server and required dependencies:
@@ -49,6 +62,7 @@ import { registerGraph } from '@langgraph-js/pure-graph';
 import { graph } from './agent/my-graph';
 import { Hono } from 'hono';
 import LangGraphApp, { type LangGraphServerContext } from '@langgraph-js/pure-graph/dist/adapter/hono/index';
+import { cors } from 'hono/cors';
 
 // Register your graphs
 registerGraph('my-assistant', graph);
@@ -56,13 +70,11 @@ registerGraph('my-assistant', graph);
 const app = new Hono<{ Variables: LangGraphServerContext }>();
 
 // Add CORS support (recommended)
-app.use('*', async (c, next) => {
-    c.header('Access-Control-Allow-Origin', '*');
-    c.header('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
-    c.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    if (c.req.method === 'OPTIONS') {
-        return c.text('', 200);
-    }
+app.use(cors());
+
+// Optional: Add custom middleware before LangGraph routes
+app.use('/api/*', async (c, next) => {
+    // Add authentication, logging, etc.
     await next();
 });
 
@@ -71,6 +83,8 @@ app.route('/api', LangGraphApp);
 
 export default app;
 ```
+
+> **Note**: The Hono adapter is a thin wrapper that extracts `langgraph_context` from Hono's context and passes it to the core fetch handler. All API logic is framework-agnostic.
 
 ### 2. Define Your Graph
 
@@ -593,3 +607,52 @@ CMD ["npm", "start"]
 -   Verify network connectivity
 -   Confirm database server is running
 -   Check user permissions and credentials
+
+## Alternative: Direct Fetch Handler
+
+For maximum flexibility, you can use the core fetch handler directly:
+
+```typescript
+// src/app.ts
+import { Hono } from 'hono';
+import { handleRequest } from '@langgraph-js/pure-graph/dist/adapter/fetch';
+import { registerGraph } from '@langgraph-js/pure-graph';
+import { graph } from './agent/my-graph';
+
+registerGraph('my-assistant', graph);
+
+const app = new Hono();
+
+app.all('/api/*', async (c) => {
+    // Extract context from Hono
+    const context = {
+        langgraph_context: {
+            userId: c.req.header('x-user-id'),
+            // Add any custom context
+        },
+    };
+
+    // Use core fetch handler directly
+    return await handleRequest(c.req.raw, context);
+});
+
+export default app;
+```
+
+This gives you full control over request/response handling while still using the same core implementation.
+
+## Migration Benefits
+
+Using the Hono adapter (or fetch handler) means:
+
+-   **Easy Platform Migration**: Switch to Cloudflare Workers, Deno, or others without rewriting API logic
+-   **Consistent Behavior**: Same API implementation across all platforms
+-   **Future Proof**: Based on web standards, not proprietary APIs
+-   **Reduced Bundle Size**: Minimal adapter code means smaller deployments
+
+## Next Steps
+
+-   [Architecture Overview](/docs/getting-started/architecture) - Understand the layered design
+-   [Standard Fetch Handler](/docs/frameworks/fetch) - Learn about the core implementation
+-   [Storage Configuration](/docs/storage/overview) - Configure persistence
+-   [Authentication](/docs/auth/overview) - Secure your endpoints

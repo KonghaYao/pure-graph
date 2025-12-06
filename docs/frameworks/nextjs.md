@@ -6,6 +6,22 @@ title: Next.js
 
 Open LangGraph Server provides seamless integration with Next.js applications through its App Router. This guide covers everything you need to know to get started with Open LangGraph Server in your Next.js project.
 
+## Architecture Overview
+
+The Next.js adapter is a **thin wrapper** (~40 lines of code) around the core fetch handler. It:
+-   Extracts context from the `x-langgraph-context` header
+-   Handles Next.js-specific initialization patterns
+-   Passes requests to the standard fetch implementation
+
+```
+Next.js Request → Extract Header Context → Core Fetch Handler → Response
+```
+
+This architecture provides:
+-   ✅ Framework-agnostic core logic
+-   ✅ Consistent behavior across all platforms
+-   ✅ Easy migration if you switch frameworks
+
 ## Installation
 
 Install Open LangGraph Server alongside your LangGraph dependencies:
@@ -75,6 +91,8 @@ export const DELETE = async (req: NextRequest) => {
     return DELETE(req);
 };
 ```
+
+> **Important**: The Next.js adapter handles the framework's specific initialization requirements while using the same core fetch handler as other platforms. This ensures consistent API behavior across all deployments.
 
 ### 2. Register Your Graphs
 
@@ -437,3 +455,92 @@ unset DATABASE_INIT
 -   Ensure middleware is configured correctly
 -   Check that `x-langgraph-context` header is being set
 -   Verify context format matches expected structure
+
+## Alternative: Direct Fetch Handler
+
+For simpler use cases or if you prefer direct control, you can use the core fetch handler:
+
+```typescript
+// app/api/langgraph/[...path]/route.ts
+import { NextRequest } from 'next/server';
+import { handleRequest } from '@langgraph-js/pure-graph/dist/adapter/fetch';
+import { LangGraphGlobal } from '@langgraph-js/pure-graph/dist/global';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+// Initialize once
+let initialized = false;
+async function ensureInit() {
+    if (!initialized) {
+        await LangGraphGlobal.initGlobal();
+        await import('@/agent/index');
+        initialized = true;
+    }
+}
+
+export async function GET(req: NextRequest) {
+    await ensureInit();
+
+    // Extract context from headers
+    const contextHeader = req.headers.get('x-langgraph-context');
+    const context = contextHeader 
+        ? { langgraph_context: JSON.parse(decodeURIComponent(contextHeader)) }
+        : {};
+
+    return await handleRequest(req, context);
+}
+
+export async function POST(req: NextRequest) {
+    await ensureInit();
+
+    const contextHeader = req.headers.get('x-langgraph-context');
+    const context = contextHeader 
+        ? { langgraph_context: JSON.parse(decodeURIComponent(contextHeader)) }
+        : {};
+
+    return await handleRequest(req, context);
+}
+
+export async function DELETE(req: NextRequest) {
+    await ensureInit();
+
+    const contextHeader = req.headers.get('x-langgraph-context');
+    const context = contextHeader 
+        ? { langgraph_context: JSON.parse(decodeURIComponent(contextHeader)) }
+        : {};
+
+    return await handleRequest(req, context);
+}
+```
+
+This approach gives you full control while still using the same core implementation as other platforms.
+
+## Migration Benefits
+
+Using the Next.js adapter (or fetch handler) provides:
+
+-   **Platform Flexibility**: Same API logic can run on Vercel, Cloudflare, or any Node.js server
+-   **Consistent Behavior**: Identical API responses across all platforms
+-   **Standard Web APIs**: Based on WHATWG Fetch specification
+-   **Future Proof**: Not locked into Next.js-specific APIs
+
+## Comparison with Other Platforms
+
+| Feature | Next.js Adapter | Hono Adapter | Direct Fetch |
+|---------|----------------|--------------|--------------|
+| **Framework** | Next.js App Router | Hono.js | Any |
+| **Context Source** | `x-langgraph-context` header | Hono context variable | Custom |
+| **Initialization** | `ensureInitialized()` | Standard | Manual |
+| **Code Size** | ~40 lines | ~30 lines | 0 lines |
+| **Core Logic** | ✅ Same | ✅ Same | ✅ Same |
+
+All adapters use the **exact same core implementation**, ensuring consistent behavior across platforms.
+
+## Next Steps
+
+-   [Architecture Overview](/docs/getting-started/architecture) - Understand the layered design
+-   [Standard Fetch Handler](/docs/frameworks/fetch) - Learn about the core implementation
+-   [Hono.js Integration](/docs/frameworks/hono) - Compare with other frameworks
+-   [Storage Configuration](/docs/storage/overview) - Configure persistence
+-   [Authentication](/docs/auth/overview) - Secure your endpoints

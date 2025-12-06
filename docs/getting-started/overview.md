@@ -12,12 +12,13 @@ Purpose-built for TypeScript and designed around LangGraph patterns, Open LangGr
 
 Some highlights include:
 
--   **Framework Integration** - Native support for Next.js, Hono.js, and any JavaScript framework
+-   **Platform Agnostic** - Core built on standard Web APIs (Request/Response), runs anywhere
+-   **Framework Integration** - Thin adapters for Next.js, Hono.js, Cloudflare Workers, Deno, and more
 -   **Enterprise Storage** - Multiple backends (SQLite, PostgreSQL, Redis) with automatic configuration
--   **Real-time Streaming** - High-performance message queues with Server-Sent Events
+-   **Real-time Streaming** - High-performance SSE streaming with custom heartbeat implementation
 -   **Thread Management** - Complete conversation lifecycle with status tracking and persistence
--   **Type Safety** - Full TypeScript support with runtime validation
--   **Authentication** - Flexible auth integration with Better Auth, API keys, or custom middleware
+-   **Type Safety** - Full TypeScript support with Zod runtime validation
+-   **Easy Migration** - Same core logic across all platforms, switch anytime
 
 ## What can you build?
 
@@ -45,10 +46,13 @@ npx @langgraph-js/ui
 
 Visit the URL shown in your terminal to explore your graphs visually.
 
-Choose your framework to get started:
+Choose your platform to get started:
 
--   [Next.js Quick Start](/docs/frameworks/nextjs) - For full-stack React applications
+-   [Standard Fetch Handler](/docs/frameworks/fetch) - **Recommended**: Works on any platform with Web APIs
+-   [Next.js Quick Start](/docs/frameworks/nextjs) - For full-stack React applications  
 -   [Hono.js Quick Start](/docs/frameworks/hono) - For lightweight API servers
+
+> **💡 New Architecture**: All adapters now use the same core fetch handler, making it easy to migrate between platforms. The fetch handler works on Cloudflare Workers, Deno Deploy, Vercel Edge, Bun, and more!
 
 ## Learn more
 
